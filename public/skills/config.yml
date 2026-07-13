@@ -1,0 +1,50 @@
+categories:
+  - name: Frontend
+    icon: "code"
+    skills:
+      - name: React
+        level: 95
+      - name: TypeScript
+        level: 92
+      - name: Next.js
+        level: 90
+      - name: Tailwind CSS
+        level: 93
+      - name: Vue.js
+        level: 78
+      - name: Framer Motion
+        level: 85
+
+  - name: Backend
+    icon: "database"
+    skills:
+      - name: Node.js
+        level: 88
+      - name: Python
+        level: 82
+      - name: PostgreSQL
+        level: 80
+      - name: GraphQL
+        level: 75
+      - name: Redis
+        level: 70
+
+  - name: Design
+    icon: "palette"
+    skills:
+      - name: Figma
+        level: 85
+      - name: Framer
+        level: 80
+
+  - name: Tools
+    icon: "wrench"
+    skills:
+      - name: Git
+        level: 92
+      - name: Docker
+        level: 78
+      - name: AWS
+        level: 74
+      - name: CI/CD
+        level: 80

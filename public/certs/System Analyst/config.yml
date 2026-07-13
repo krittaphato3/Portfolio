@@ -1,0 +1,11 @@
+certificates:
+  - image: "SA1.png"
+    link: "https://credential.net/example6"
+    description: "Microsoft Certified: Azure Solutions Architect Expert - Design cloud solutions."
+    issuer: "Microsoft"
+    date: "2024-05-22"
+  - image: "SA2.png"
+    link: "https://credential.net/example7"
+    description: "Certified Information Systems Analyst (CISA) - IS audit and control."
+    issuer: "ISACA"
+    date: "2024-07-01"

@@ -1,0 +1,12 @@
+certificates:
+  - image: "Cyber1.png"
+    link: "https://credential.net/example1"
+    description: "CompTIA Security+ Certification - Validates foundational vendor-neutral IT security knowledge and skills."
+    issuer: "CompTIA"
+    date: "2024-01-15"
+  - image: "Cyber2.png"
+    link: "https://credential.net/example2"
+    description: "CEH Certified Ethical Hacker - Demonstrates knowledge in finding vulnerabilities."
+    issuer: "EC-Council"
+    date: "2024-03-20"
+  - image: "Cyber3.png"
