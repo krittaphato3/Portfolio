@@ -236,20 +236,22 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
     </div>
   ) : (
     <>
-      <div className={`space-y-4 ${expanded ? 'max-h-[600px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}>
-        {visibleCategories.map((category, index) => (
-          <CategorySection
-            key={category}
-            category={category}
-            skills={grouped[category]}
-            index={index}
-            animationsEnabled={animationsEnabled}
-          />
-        ))}
+      <div className={`flex flex-col flex-1 ${expanded ? 'max-h-[600px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}>
+        <div className="space-y-4 flex-1">
+          {visibleCategories.map((category, index) => (
+            <CategorySection
+              key={category}
+              category={category}
+              skills={grouped[category]}
+              index={index}
+              animationsEnabled={animationsEnabled}
+            />
+          ))}
+        </div>
       </div>
 
       {hasMore && (
-        <div className="flex justify-center mt-4 pt-4 border-t border-border-subtle/50">
+        <div className="flex justify-center mt-auto pt-4 border-t border-border-subtle/50">
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -274,7 +276,7 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
   );
 
   return (
-    <div className="p-6">
+    <div className="p-6 flex flex-col h-full">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-primary-violet/10 rounded-xl">
           <Code2 className="w-5 h-5 text-primary-violet" />

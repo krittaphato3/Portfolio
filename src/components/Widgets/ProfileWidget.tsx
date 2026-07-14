@@ -1,6 +1,15 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Calendar, GitBranch, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import type { GitHubUserProfile } from '../../lib/github';
+
+const roles = [
+  'Senior Software Engineer',
+  'Full Stack Developer',
+  'Cyber Security Engineer',
+  'AI / ML Engineer',
+  'Cloud Solutions Architect',
+];
 
 interface ProfileWidgetProps {
   githubProfile?: GitHubUserProfile | null;
@@ -9,6 +18,38 @@ interface ProfileWidgetProps {
 export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
   const avatarUrl = githubProfile?.avatar_url;
   const githubUrl = githubProfile?.html_url || 'https://github.com/krittaphato3';
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Typewriter effect
+  useEffect(() => {
+    const currentRole = roles[roleIndex];
+    const speed = isDeleting ? 30 : 60;
+
+    if (!isDeleting && displayText === currentRole) {
+      // Pause before deleting
+      const timeout = setTimeout(() => setIsDeleting(true), 2500);
+      return () => clearTimeout(timeout);
+    }
+
+    if (isDeleting && displayText === '') {
+      // Move to next role
+      setIsDeleting(false);
+      setRoleIndex((prev) => (prev + 1) % roles.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      if (isDeleting) {
+        setDisplayText(currentRole.slice(0, displayText.length - 1));
+      } else {
+        setDisplayText(currentRole.slice(0, displayText.length + 1));
+      }
+    }, speed);
+
+    return () => clearTimeout(timeout);
+  }, [displayText, isDeleting, roleIndex]);
 
   return (
     <div className="relative p-6 h-full overflow-hidden min-h-[320px]">
@@ -61,8 +102,9 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           <h2 className="text-2xl font-bold text-text-primary tracking-tight mb-1">
             Krittaphat Panyasomphan
           </h2>
-          <p className="text-text-secondary text-sm mb-4">
-            Senior Software Engineer
+          <p className="text-text-secondary text-sm mb-4 h-5">
+            <span>{displayText}</span>
+            <span className="inline-block w-[2px] h-4 bg-primary-cyan ml-0.5 animate-pulse" />
           </p>
         </motion.div>
 
