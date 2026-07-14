@@ -14,6 +14,9 @@ import {
   X,
   ZoomIn,
   ZoomOut,
+  Calendar,
+  Building2,
+  LinkIcon,
 } from 'lucide-react';
 import { PdfViewer } from '../UI/PdfViewer';
 import { useSettings } from '../../hooks/useSettings';
@@ -96,6 +99,7 @@ function ImageLightbox({
 }) {
   const [imgScale, setImgScale] = useState(1);
   const imageUrl = safeImageUrl(cert.imageUrl);
+  const certLink = safeUrl(cert.link);
 
   return (
     <motion.div
@@ -110,10 +114,11 @@ function ImageLightbox({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="relative w-full max-w-4xl max-h-[90vh] mx-4 bg-bg-card rounded-2xl border border-border-subtle overflow-hidden"
+        className="relative w-full max-w-4xl max-h-[90vh] mx-4 bg-bg-card rounded-2xl border border-border-subtle overflow-hidden flex flex-col"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle flex-shrink-0">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setImgScale(s => Math.max(0.5, s - 0.2))}
@@ -137,15 +142,17 @@ function ImageLightbox({
           </div>
 
           <div className="flex items-center gap-2">
-            <a
-              href={imageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg hover:bg-bg-elevated transition-colors"
-              aria-label="Open in new tab"
-            >
-              <ExternalLink className="w-4 h-4 text-text-secondary" />
-            </a>
+            {certLink !== '#' && (
+              <a
+                href={certLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-cyan bg-primary-cyan/10 border border-primary-cyan/30 rounded-lg hover:bg-primary-cyan/20 transition-colors"
+              >
+                <LinkIcon className="w-3.5 h-3.5" />
+                View Certificate
+              </a>
+            )}
             <button
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-bg-elevated transition-colors"
@@ -156,7 +163,8 @@ function ImageLightbox({
           </div>
         </div>
 
-        <div className="overflow-auto max-h-[calc(90vh-60px)] flex justify-center p-4">
+        {/* Image */}
+        <div className="overflow-auto flex-1 flex justify-center p-4 min-h-0">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -170,6 +178,28 @@ function ImageLightbox({
               <p className="text-sm text-text-muted">Image not available</p>
             </div>
           )}
+        </div>
+
+        {/* Metadata footer */}
+        <div className="px-5 py-4 border-t border-border-subtle bg-bg-elevated/50 flex-shrink-0">
+          <h4 className="text-sm font-semibold text-text-primary mb-2">{cert.description}</h4>
+          <div className="flex flex-wrap items-center gap-4 text-xs text-text-muted">
+            <span className="flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-text-dim" />
+              {cert.issuer}
+            </span>
+            {cert.date && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-text-dim" />
+                {new Date(cert.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </span>
+            )}
+            {cert.category && (
+              <span className="px-2 py-0.5 rounded-md bg-bg-card border border-border-subtle text-text-dim">
+                {cert.category}
+              </span>
+            )}
+          </div>
         </div>
       </motion.div>
     </motion.div>
@@ -193,7 +223,7 @@ function CertCard({
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-50px' });
   const imageUrl = safeImageUrl(cert.imageUrl);
-  const _linkUrl = safeUrl(cert.link);
+  const certLink = safeUrl(cert.link);
   const isPdf = cert.type === 'pdf';
 
   return (
@@ -206,14 +236,14 @@ function CertCard({
       className={`
         group relative rounded-xl border border-border-subtle
         hover:border-primary-cyan/30 transition-all duration-300
-        bg-bg-elevated overflow-hidden cursor-pointer
+        bg-bg-elevated overflow-hidden
         ${compact ? 'p-3' : 'p-4'}
       `}
       onClick={onOpen}
       role="button"
       tabIndex={0}
       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onOpen(); }}
-      aria-label={`Certificate: ${cert.description.split(' - ')[0]}`}
+      aria-label={`Certificate: ${cert.description}`}
     >
       <div
         className={`bg-bg-card rounded-lg mb-3 overflow-hidden flex items-center justify-center ${
@@ -245,14 +275,17 @@ function CertCard({
         )}
       </div>
 
+      {/* Full description */}
       <p
-        className={`text-text-primary font-medium line-clamp-2 mb-1.5 ${
-          compact ? 'text-xs' : 'text-sm'
+        className={`text-text-primary font-medium mb-1.5 ${
+          compact ? 'text-xs line-clamp-2' : 'text-sm line-clamp-3'
         }`}
       >
-        {cert.description.split(' - ')[0]}
+        {cert.description}
       </p>
-      <div className="flex items-center justify-between">
+
+      {/* Issuer + Date */}
+      <div className="flex items-center gap-2 mb-2">
         <span
           className={`text-text-muted truncate ${
             compact ? 'text-[10px]' : 'text-xs'
@@ -260,12 +293,32 @@ function CertCard({
         >
           {cert.issuer}
         </span>
-        <ExternalLink
-          className={`text-text-dim group-hover:text-primary-cyan transition-colors flex-shrink-0 ${
-            compact ? 'w-3.5 h-3.5' : 'w-4 h-4'
-          }`}
-        />
+        {cert.date && !compact && (
+          <>
+            <span className="text-text-dim">·</span>
+            <span className="flex items-center gap-1 text-[11px] text-text-dim">
+              <Calendar className="w-3 h-3" />
+              {new Date(cert.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
+            </span>
+          </>
+        )}
       </div>
+
+      {/* View Certificate link */}
+      {certLink !== '#' && (
+        <div
+          className={`flex items-center gap-1.5 text-primary-cyan font-medium group-hover:underline ${
+            compact ? 'text-[10px]' : 'text-xs'
+          }`}
+          onClick={e => {
+            e.stopPropagation();
+            window.open(certLink, '_blank', 'noopener,noreferrer');
+          }}
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+          View Certificate
+        </div>
+      )}
 
       {cert.category && !compact && (
         <span className="absolute top-3 right-3 px-1.5 py-0.5 text-[9px] font-medium rounded-md bg-bg-dark/80 backdrop-blur-sm text-text-dim border border-border-subtle/50">
@@ -542,6 +595,10 @@ export function CertPanel({
           <PdfViewer
             fileUrl={safeImageUrl(viewerCert.imageUrl) || viewerCert.imageUrl}
             onClose={handleClose}
+            certLink={safeUrl(viewerCert.link)}
+            description={viewerCert.description}
+            issuer={viewerCert.issuer}
+            date={viewerCert.date}
           />
         )}
         {viewerCert && viewerCert.type === 'image' && (

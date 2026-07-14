@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Download, LinkIcon, Building2, Calendar } from 'lucide-react';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -11,9 +11,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 interface PdfViewerProps {
   fileUrl: string;
   onClose: () => void;
+  certLink?: string;
+  description?: string;
+  issuer?: string;
+  date?: string;
 }
 
-export function PdfViewer({ fileUrl, onClose }: PdfViewerProps) {
+export function PdfViewer({ fileUrl, onClose, certLink, description, issuer, date }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1);
@@ -101,6 +105,17 @@ export function PdfViewer({ fileUrl, onClose }: PdfViewerProps) {
             )}
 
             <div className="flex items-center gap-2">
+              {certLink && (
+                <a
+                  href={certLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-cyan bg-primary-cyan/10 border border-primary-cyan/30 rounded-lg hover:bg-primary-cyan/20 transition-colors"
+                >
+                  <LinkIcon className="w-3.5 h-3.5" />
+                  View Certificate
+                </a>
+              )}
               <a
                 href={fileUrl}
                 download
@@ -153,6 +168,27 @@ export function PdfViewer({ fileUrl, onClose }: PdfViewerProps) {
               </Document>
             )}
           </div>
+
+          {/* Metadata footer */}
+          {(description || issuer || date) && (
+            <div className="px-5 py-4 border-t border-border-subtle bg-bg-elevated/50">
+              {description && <h4 className="text-sm font-semibold text-text-primary mb-2">{description}</h4>}
+              <div className="flex flex-wrap items-center gap-4 text-xs text-text-muted">
+                {issuer && (
+                  <span className="flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-text-dim" />
+                    {issuer}
+                  </span>
+                )}
+                {date && (
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-text-dim" />
+                    {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
