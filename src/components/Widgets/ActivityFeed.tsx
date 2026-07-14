@@ -1,8 +1,8 @@
 import { motion, useInView } from 'framer-motion';
-import { Activity, Award, Pin, Folder, Sparkles, Plus, MapPin, ExternalLink } from 'lucide-react';
+import { Activity, Award, Pin, Folder, Sparkles, Plus, MapPin, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import type { ActivityItem } from '../../lib/types';
 import { useSettings } from '../../hooks/useSettings';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 interface ActivityFeedProps {
   activities: ActivityItem[];
@@ -183,12 +183,17 @@ export function ActivityFeed({
 }: ActivityFeedProps) {
   const { settings } = useSettings();
   const animationsEnabled = settings.display.animations;
+  const [expanded, setExpanded] = useState(false);
 
   const filteredActivities = activities.filter((activity) => {
     if (activity.type === 'cert' && !settings.notifications.certAlerts) return false;
     if ((activity.type === 'project' || activity.type === 'feature') && !settings.notifications.projectUpdates) return false;
     return true;
   });
+
+  const COLLAPSED_LIMIT = 4;
+  const hasMore = filteredActivities.length > COLLAPSED_LIMIT;
+  const visibleActivities = expanded ? filteredActivities : filteredActivities.slice(0, COLLAPSED_LIMIT);
 
   const showPinSuggestion = !loading && activities.length === 0;
 
@@ -246,19 +251,46 @@ export function ActivityFeed({
           )}
         </div>
       ) : (
-        <div className="relative">
-          {filteredActivities.map((activity, index) => (
-            <ActivityItemComponent
-              key={activity.id}
-              activity={activity}
-              index={index}
-              isFirst={index === 0}
-              isLast={index === filteredActivities.length - 1}
-              animationsEnabled={animationsEnabled}
-              onCertClick={onCertClick}
-            />
-          ))}
-        </div>
+        <>
+          <div
+            className={`relative ${expanded ? 'max-h-[600px] overflow-y-auto pr-1 scrollbar-none' : ''}`}
+          >
+            {visibleActivities.map((activity, index) => (
+              <ActivityItemComponent
+                key={activity.id}
+                activity={activity}
+                index={index}
+                isFirst={index === 0}
+                isLast={index === visibleActivities.length - 1}
+                animationsEnabled={animationsEnabled}
+                onCertClick={onCertClick}
+              />
+            ))}
+          </div>
+
+          {hasMore && (
+            <div className="flex justify-center mt-4 pt-3 border-t border-border-subtle">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setExpanded(!expanded)}
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-primary-emerald bg-primary-emerald/10 border border-primary-emerald/20 rounded-xl hover:bg-primary-emerald/15 transition-colors"
+              >
+                {expanded ? (
+                  <>
+                    Show Less
+                    <ChevronUp className="w-3.5 h-3.5" />
+                  </>
+                ) : (
+                  <>
+                    Show All ({filteredActivities.length})
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </>
+                )}
+              </motion.button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
