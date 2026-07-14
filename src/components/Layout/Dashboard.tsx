@@ -1,6 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
+import { useTilt } from '../../hooks/useTilt';
 
 interface DashboardProps {
   children: ReactNode;
@@ -76,20 +77,27 @@ const rowClasses: Record<number, string> = {
 export function BentoItem({ children, className = '', span }: BentoItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const tilt = useTilt(3);
 
   const colSpan = span?.col ?? 1;
   const rowSpan = span?.row ?? 1;
 
   return (
     <motion.div
-      ref={ref}
+      ref={(node) => {
+        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        (tilt.ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }}
       variants={itemVariants}
       initial="hidden"
       animate={isInView ? 'show' : 'hidden'}
       whileHover={{
         y: -3,
+        scale: 1.01,
         transition: { type: 'spring' as const, stiffness: 300, damping: 25 },
       }}
+      style={tilt.style}
+      {...tilt.handlers}
       className={`
         ${spanClasses[colSpan]}
         ${rowClasses[rowSpan]}

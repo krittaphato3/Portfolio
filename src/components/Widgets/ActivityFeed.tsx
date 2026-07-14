@@ -2,6 +2,7 @@ import { motion, useInView } from 'framer-motion';
 import { Activity, Award, Pin, Folder, Sparkles, Plus, MapPin, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import type { ActivityItem } from '../../lib/types';
 import { useSettings } from '../../hooks/useSettings';
+import { MagneticButton } from '../UI/MagneticButton';
 import { useRef, useState } from 'react';
 
 interface ActivityFeedProps {
@@ -270,9 +271,7 @@ export function ActivityFeed({
 
           {hasMore && (
             <div className="flex justify-center mt-auto pt-4 border-t border-border-subtle/50">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+              <MagneticButton
                 onClick={() => setExpanded(!expanded)}
                 className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-primary-emerald bg-primary-emerald/10 border border-primary-emerald/20 rounded-xl hover:bg-primary-emerald/15 transition-colors"
               >
@@ -287,7 +286,7 @@ export function ActivityFeed({
                     <ChevronDown className="w-3.5 h-3.5" />
                   </>
                 )}
-              </motion.button>
+              </MagneticButton>
             </div>
           )}
         </>

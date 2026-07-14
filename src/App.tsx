@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router';
-import { AnimatePresence } from 'framer-motion';
+import { Routes, Route, useLocation } from 'react-router';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Dashboard, BentoItem } from './components/Layout/Dashboard';
@@ -36,6 +36,7 @@ const CertificatesPage = lazy(() => import('./pages/CertificatesPage').then(m =>
    ============================================================ */
 function App() {
   const { showToast } = useToast();
+  const location = useLocation();
 
   // GitHub data
   const [repoCount, setRepoCount] = useState(0);
@@ -222,10 +223,17 @@ function App() {
         <Header settings={settings} onSettingsChange={setSettings} />
 
         <main id="main-content" className="flex-1">
-          <Routes>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
             <Route
               path="/"
               element={
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                >
                 <div id="dashboard">
                   <Dashboard>
                     {/* Row 1: Profile + 3 Stats */}
@@ -314,11 +322,18 @@ function App() {
                     </BentoItem>
                   </Dashboard>
                 </div>
+                </motion.div>
               }
             />
             <Route
               path="/certificates"
               element={
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                >
                 <Suspense
                   fallback={
                     <div className="min-h-screen bg-bg-dark flex items-center justify-center">
@@ -331,9 +346,11 @@ function App() {
                 >
                   <CertificatesPage />
                 </Suspense>
+                </motion.div>
               }
             />
           </Routes>
+          </AnimatePresence>
         </main>
 
         <Footer />
