@@ -4,3 +4,8 @@ certificates:
     description: "Cloud Agents Training of Qualys"
     issuer: "Qualys"
     date: "2026-07-13"
+  - image: "Diploma_9c43d425-1792-4c2a-9b77-7a7438a7f3ac-1.png"
+    link: "https://qualys.sumtotal.host/learning/DataStore/QUALYS_PROD/Learning/Data/ExportToPDF/Diploma_9c43d425-1792-4c2a-9b77-7a7438a7f3ac.pdf"
+    description: "CyberSecurity Asset Management of Qualys"
+    issuer: "Qualys"
+    date: "2026-07-14"

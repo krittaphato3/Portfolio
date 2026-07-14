@@ -22,6 +22,7 @@ export interface ActivityItem {
   description: string;
   timestamp: Date;
   url?: string;
+  certificateId?: string;
 }
 
 export interface StatsData {

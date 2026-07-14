@@ -13,7 +13,7 @@ import { SystemStatusWidget } from './components/Widgets/SystemStatusWidget';
 import { useToast } from './components/UI/Toast';
 import { SettingsProvider } from './hooks/useSettings';
 import { Folder, Award, Code2, Rocket } from 'lucide-react';
-import type { Skill, ActivityItem, CategoryData } from './lib/types';
+import type { Skill, ActivityItem, CategoryData, Certificate } from './lib/types';
 import { getAllCertificates, getCertificateStats } from './lib/certificates';
 import { loadSkillsFromYaml } from './lib/skills';
 import {
@@ -45,6 +45,9 @@ function App() {
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [certCount, setCertCount] = useState(0);
   const [certUpdates, setCertUpdates] = useState<ActivityItem[]>([]);
+
+  // Viewer state (lifted so ActivityFeed can open certs)
+  const [viewerCertId, setViewerCertId] = useState<string | null>(null);
 
   // Skills from YAML
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -90,12 +93,27 @@ function App() {
     () =>
       [...certUpdates, ...githubEvents]
         .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-        .slice(0, 8),
+        .slice(0, 10),
     [certUpdates, githubEvents]
   );
 
-  // Fetch GitHub data
+  // Derived: find cert by ID for viewer
+  const viewerCert = useMemo(() => {
+    if (!viewerCertId) return null;
+    return categories
+      .flatMap((cat) => cat.certificates)
+      .find((c) => c.id === viewerCertId) || null;
+  }, [viewerCertId, categories]);
+
+  // Handler: open cert in viewer from ActivityFeed
+  const handleCertClick = (certId: string) => {
+    setViewerCertId(certId);
+  };
+
+  // Fetch GitHub data (events poll every 5 minutes, profile/repos on mount)
   useEffect(() => {
+    let isActive = true;
+
     async function loadGitHub() {
       try {
         const [count, pinned, profile, events] = await Promise.all([
@@ -104,58 +122,79 @@ function App() {
           fetchGitHubUser(),
           fetchGitHubEvents(),
         ]);
+        if (!isActive) return;
         setRepoCount(count);
         setPinnedRepos(pinned);
         setGithubProfile(profile);
         setGithubEvents(events);
       } catch {
-        showToast(
-          'Could not load GitHub data. Check your connection or token.',
-          'error'
-        );
+        if (isActive) {
+          showToast(
+            'Could not load GitHub data. Check your connection or token.',
+            'error'
+          );
+        }
       } finally {
-        setLoading((prev) => ({ ...prev, github: false }));
+        if (isActive) setLoading((prev) => ({ ...prev, github: false }));
       }
     }
+
     loadGitHub();
+    // Poll GitHub events every 5 minutes (keep profile/repos on mount only)
+    const interval = setInterval(() => {
+      fetchGitHubEvents().then((events) => {
+        if (isActive) setGithubEvents(events);
+      }).catch(() => {});
+    }, 300_000);
+    return () => { isActive = false; clearInterval(interval); };
   }, [showToast]);
 
-  // Fetch certificates from file-based CMS
+  // Fetch certificates from file-based CMS (polls every 60s for YAML changes)
   useEffect(() => {
+    let isActive = true;
+
     async function loadCerts() {
       try {
         const [cats, stats] = await Promise.all([
           getAllCertificates(),
           getCertificateStats(),
         ]);
+        if (!isActive) return;
+
         setCategories(cats);
         setCertCount(stats.total);
 
-        // Build cert updates into separate state (Fix 3)
+        // Build cert activity items from ALL certs with full metadata
         const updates: ActivityItem[] = cats
           .flatMap((cat) =>
-            cat.certificates.slice(0, 1).map((cert) => ({
+            cat.certificates.map((cert) => ({
               id: `cert-${cert.id}`,
               type: 'cert' as const,
-              title: `New Certification`,
-              description: cert.description.split(' - ')[0],
+              title: cert.description.split(' - ')[0] || cert.description,
+              description: cert.issuer || cat.name,
               timestamp: cert.date ? new Date(cert.date) : new Date(),
+              url: cert.link || undefined,
+              certificateId: cert.id,
             }))
           )
-          .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-          .slice(0, 2);
+          .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
         setCertUpdates(updates);
       } catch {
-        showToast(
-          'Could not load certificates. Check the config files in public/certs/.',
-          'error'
-        );
+        if (isActive) {
+          showToast(
+            'Could not load certificates. Check the config files in public/certs/.',
+            'error'
+          );
+        }
       } finally {
-        setLoading((prev) => ({ ...prev, certs: false }));
+        if (isActive) setLoading((prev) => ({ ...prev, certs: false }));
       }
     }
+
     loadCerts();
+    const interval = setInterval(loadCerts, 60_000);
+    return () => { isActive = false; clearInterval(interval); };
   }, [showToast]);
 
   // Fetch skills from YAML config
@@ -231,7 +270,11 @@ function App() {
 
                     <BentoItem span={{ col: 2, row: 1 }}>
                       <div id="recent-updates">
-                        <ActivityFeed activities={recentUpdates} loading={loading.github || loading.certs} />
+                        <ActivityFeed
+                          activities={recentUpdates}
+                          loading={loading.github || loading.certs}
+                          onCertClick={handleCertClick}
+                        />
                       </div>
                     </BentoItem>
 
@@ -259,7 +302,13 @@ function App() {
                     {/* Row 4: Certifications compact */}
                     <BentoItem span={{ col: 4, row: 1 }}>
                       <div id="certifications">
-                        <CertPanel categories={categories} loading={loading.certs} compact />
+                        <CertPanel
+                          categories={categories}
+                          loading={loading.certs}
+                          compact
+                          externalViewerCert={viewerCert}
+                          onCloseExternalViewer={() => setViewerCertId(null)}
+                        />
                       </div>
                     </BentoItem>
                   </Dashboard>

@@ -9,6 +9,7 @@ interface ActivityFeedProps {
   loading: boolean;
   onAddCertificate?: () => void;
   onPinRepo?: () => void;
+  onCertClick?: (certId: string) => void;
 }
 
 const typeConfig = {
@@ -72,12 +73,13 @@ function relativeTime(date: Date): string {
   return `${years} year${years === 1 ? '' : 's'} ago`;
 }
 
-function ActivityItemComponent({ activity, index, isFirst, isLast, animationsEnabled }: {
+function ActivityItemComponent({ activity, index, isFirst, isLast, animationsEnabled, onCertClick }: {
   activity: ActivityItem;
   index: number;
   isFirst: boolean;
   isLast: boolean;
   animationsEnabled: boolean;
+  onCertClick?: (certId: string) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-50px' });
@@ -87,7 +89,7 @@ function ActivityItemComponent({ activity, index, isFirst, isLast, animationsEna
   if (!animationsEnabled) {
     return (
       <div ref={ref} className="flex gap-3 group relative">
-        <ActivityItemContent activity={activity} config={config} Icon={Icon} isFirst={isFirst} isLast={isLast} />
+        <ActivityItemContent activity={activity} config={config} Icon={Icon} isFirst={isFirst} isLast={isLast} onCertClick={onCertClick} />
       </div>
     );
   }
@@ -101,17 +103,18 @@ function ActivityItemComponent({ activity, index, isFirst, isLast, animationsEna
       className="flex gap-3 group relative"
       layout
     >
-      <ActivityItemContent activity={activity} config={config} Icon={Icon} isFirst={isFirst} isLast={isLast} />
+      <ActivityItemContent activity={activity} config={config} Icon={Icon} isFirst={isFirst} isLast={isLast} onCertClick={onCertClick} />
     </motion.div>
   );
 }
 
-function ActivityItemContent({ activity, config, Icon, isFirst, isLast }: {
+function ActivityItemContent({ activity, config, Icon, isFirst, isLast, onCertClick }: {
   activity: ActivityItem;
   config: typeof typeConfig[keyof typeof typeConfig];
   Icon: React.ElementType;
   isFirst: boolean;
   isLast: boolean;
+  onCertClick?: (certId: string) => void;
 }) {
   return (
     <>
@@ -145,7 +148,16 @@ function ActivityItemContent({ activity, config, Icon, isFirst, isLast }: {
         <p className="text-xs text-text-muted truncate mt-0.5">{activity.description}</p>
         <div className="flex items-center gap-2 mt-1">
           <time className="text-[11px] text-text-dim">{relativeTime(activity.timestamp)}</time>
-          {activity.url && (
+          {activity.type === 'cert' && activity.certificateId && onCertClick && (
+            <button
+              onClick={() => onCertClick(activity.certificateId!)}
+              className="text-[11px] text-text-dim hover:text-primary-cyan transition-colors inline-flex items-center gap-0.5 cursor-pointer"
+            >
+              <ExternalLink className="w-3 h-3" />
+              View
+            </button>
+          )}
+          {activity.type !== 'cert' && activity.url && (
             <a
               href={activity.url}
               target="_blank"
@@ -167,6 +179,7 @@ export function ActivityFeed({
   loading,
   onAddCertificate,
   onPinRepo,
+  onCertClick,
 }: ActivityFeedProps) {
   const { settings } = useSettings();
   const animationsEnabled = settings.display.animations;
@@ -242,6 +255,7 @@ export function ActivityFeed({
               isFirst={index === 0}
               isLast={index === filteredActivities.length - 1}
               animationsEnabled={animationsEnabled}
+              onCertClick={onCertClick}
             />
           ))}
         </div>

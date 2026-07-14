@@ -30,6 +30,8 @@ interface CertPanelProps {
   loading: boolean;
   limit?: number;
   compact?: boolean;
+  externalViewerCert?: Certificate | null;
+  onCloseExternalViewer?: () => void;
 }
 
 type GridSize = 'small' | 'medium' | 'large';
@@ -349,6 +351,8 @@ export function CertPanel({
   loading,
   limit = 6,
   compact = false,
+  externalViewerCert,
+  onCloseExternalViewer,
 }: CertPanelProps) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [expanded, setExpanded] = useState(false);
@@ -382,7 +386,11 @@ export function CertPanel({
 
   const handleClose = () => {
     setViewerCert(null);
+    onCloseExternalViewer?.();
   };
+
+  // Merge external (from ActivityFeed) and internal (from card click) viewer state
+  const activeViewerCert = externalViewerCert || viewerCert;
 
   return (
     <div className="p-6">
@@ -591,18 +599,18 @@ export function CertPanel({
 
       {/* Viewers */}
       <AnimatePresence>
-        {viewerCert && viewerCert.type === 'pdf' && (
+        {activeViewerCert && activeViewerCert.type === 'pdf' && (
           <PdfViewer
-            fileUrl={safeImageUrl(viewerCert.imageUrl) || viewerCert.imageUrl}
+            fileUrl={safeImageUrl(activeViewerCert.imageUrl) || activeViewerCert.imageUrl}
             onClose={handleClose}
-            certLink={safeUrl(viewerCert.link)}
-            description={viewerCert.description}
-            issuer={viewerCert.issuer}
-            date={viewerCert.date}
+            certLink={safeUrl(activeViewerCert.link)}
+            description={activeViewerCert.description}
+            issuer={activeViewerCert.issuer}
+            date={activeViewerCert.date}
           />
         )}
-        {viewerCert && viewerCert.type === 'image' && (
-          <ImageLightbox cert={viewerCert} onClose={handleClose} />
+        {activeViewerCert && activeViewerCert.type === 'image' && (
+          <ImageLightbox cert={activeViewerCert} onClose={handleClose} />
         )}
       </AnimatePresence>
     </div>
