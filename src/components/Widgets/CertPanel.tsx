@@ -252,8 +252,8 @@ function CertCard({
         }`}
       >
         {isPdf ? (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-bg-dark">
-            <FileText className="w-8 h-8 text-primary-violet" />
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-primary-violet/5 to-bg-card">
+            <FileText className="w-8 h-8 text-primary-violet/70" />
             <span className="text-[10px] text-text-dim font-medium uppercase tracking-wider">
               PDF Document
             </span>
@@ -262,16 +262,23 @@ function CertCard({
           <img
             src={imageUrl}
             alt={cert.description}
-            className="w-full h-full object-contain opacity-70 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-500"
+            className="w-full h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-500"
             loading="lazy"
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
+              // Show fallback gradient when image fails
+              const parent = target.parentElement;
+              if (parent) {
+                parent.classList.add('from-bg-elevated', 'to-bg-card', 'bg-gradient-to-br');
+                parent.innerHTML = '<div class="flex flex-col items-center justify-center py-8"><svg class="w-10 h-10 text-text-dim mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span class="text-xs text-text-dim">Image not available</span></div>';
+              }
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <FileImage className="w-8 h-8 text-text-dim" />
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-card">
+            <FileImage className="w-8 h-8 text-text-dim mb-1.5" />
+            <span className="text-[10px] text-text-dim">No preview</span>
           </div>
         )}
       </div>
