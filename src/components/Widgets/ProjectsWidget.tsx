@@ -108,7 +108,7 @@ function RepoCardContent({ repo, topics, lang }: { repo: PinnedRepo; topics: Rep
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           {repo.homepageUrl && (
             <motion.a
-              href={repo.homepageUrl}
+              href={repo.homepageUrl && /^https?:\/\//.test(repo.homepageUrl) ? repo.homepageUrl : '#'}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Live demo for ${repo.name}`}
