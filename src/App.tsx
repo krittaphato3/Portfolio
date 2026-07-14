@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router';
+import { AnimatePresence } from 'framer-motion';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Dashboard, BentoItem } from './components/Layout/Dashboard';
 import { ProfileWidget } from './components/Widgets/ProfileWidget';
 import { StatCard } from './components/Widgets/StatCard';
-import { CertPanel } from './components/Widgets/CertPanel';
+import { CertPanel, ImageLightbox, safeUrl, safeImageUrl } from './components/Widgets/CertPanel';
+import { PdfViewer } from './components/UI/PdfViewer';
 import { SkillsWidget } from './components/Widgets/SkillsWidget';
 import { ActivityFeed } from './components/Widgets/ActivityFeed';
 import { ProjectsWidget } from './components/Widgets/ProjectsWidget';
@@ -306,8 +308,7 @@ function App() {
                           categories={categories}
                           loading={loading.certs}
                           compact
-                          externalViewerCert={viewerCert}
-                          onCloseExternalViewer={() => setViewerCertId(null)}
+                          onCertOpen={handleCertClick}
                         />
                       </div>
                     </BentoItem>
@@ -336,6 +337,24 @@ function App() {
         </main>
 
         <Footer />
+
+        {/* Certificate viewers — rendered at App level (outside BentoItems)
+            to escape CSS transform containing blocks that break fixed positioning */}
+        <AnimatePresence>
+          {viewerCert && viewerCert.type === 'pdf' && (
+            <PdfViewer
+              fileUrl={safeImageUrl(viewerCert.imageUrl) || viewerCert.imageUrl}
+              onClose={() => setViewerCertId(null)}
+              certLink={safeUrl(viewerCert.link)}
+              description={viewerCert.description}
+              issuer={viewerCert.issuer}
+              date={viewerCert.date}
+            />
+          )}
+          {viewerCert && viewerCert.type === 'image' && (
+            <ImageLightbox cert={viewerCert} onClose={() => setViewerCertId(null)} />
+          )}
+        </AnimatePresence>
       </div>
     </SettingsProvider>
   );

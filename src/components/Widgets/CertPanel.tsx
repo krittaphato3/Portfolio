@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
+
 import {
   Award,
   ExternalLink,
@@ -18,7 +19,6 @@ import {
   Building2,
   LinkIcon,
 } from 'lucide-react';
-import { PdfViewer } from '../UI/PdfViewer';
 import { useSettings } from '../../hooks/useSettings';
 import type { Certificate, CategoryData } from '../../lib/types';
 
@@ -30,8 +30,7 @@ interface CertPanelProps {
   loading: boolean;
   limit?: number;
   compact?: boolean;
-  externalViewerCert?: Certificate | null;
-  onCloseExternalViewer?: () => void;
+  onCertOpen?: (certId: string) => void;
 }
 
 type GridSize = 'small' | 'medium' | 'large';
@@ -45,7 +44,7 @@ const GRID_CONFIG: Record<GridSize, { cols: string; label: string; icon: typeof 
 /* ----------------------------------------------------------------
    SAFE URL UTILITIES
    ---------------------------------------------------------------- */
-function safeUrl(url: string | undefined): string {
+export function safeUrl(url: string | undefined): string {
   if (!url) return '#';
   try {
     const parsed = new URL(url);
@@ -56,7 +55,7 @@ function safeUrl(url: string | undefined): string {
   }
 }
 
-function safeImageUrl(url: string | undefined): string {
+export function safeImageUrl(url: string | undefined): string {
   if (!url) return '';
   try {
     const parsed = new URL(url, window.location.origin);
@@ -92,7 +91,7 @@ function CertSkeleton({ compact }: { compact: boolean }) {
 /* ----------------------------------------------------------------
    IMAGE LIGHTBOX
    ---------------------------------------------------------------- */
-function ImageLightbox({
+export function ImageLightbox({
   cert,
   onClose,
 }: {
@@ -351,13 +350,11 @@ export function CertPanel({
   loading,
   limit = 6,
   compact = false,
-  externalViewerCert,
-  onCloseExternalViewer,
+  onCertOpen,
 }: CertPanelProps) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [expanded, setExpanded] = useState(false);
   const [gridSize, setGridSize] = useState<GridSize>('medium');
-  const [viewerCert, setViewerCert] = useState<Certificate | null>(null);
   const { settings } = useSettings();
 
   const isCompactView = compact;
@@ -381,16 +378,8 @@ export function CertPanel({
   const cardCompact = isCompactView || settings.display.compactMode || gridSize === 'small';
 
   const handleOpen = (cert: Certificate) => {
-    setViewerCert(cert);
+    onCertOpen?.(cert.id);
   };
-
-  const handleClose = () => {
-    setViewerCert(null);
-    onCloseExternalViewer?.();
-  };
-
-  // Merge external (from ActivityFeed) and internal (from card click) viewer state
-  const activeViewerCert = externalViewerCert || viewerCert;
 
   return (
     <div className="p-6">
@@ -597,22 +586,6 @@ export function CertPanel({
         </div>
       )}
 
-      {/* Viewers */}
-      <AnimatePresence>
-        {activeViewerCert && activeViewerCert.type === 'pdf' && (
-          <PdfViewer
-            fileUrl={safeImageUrl(activeViewerCert.imageUrl) || activeViewerCert.imageUrl}
-            onClose={handleClose}
-            certLink={safeUrl(activeViewerCert.link)}
-            description={activeViewerCert.description}
-            issuer={activeViewerCert.issuer}
-            date={activeViewerCert.date}
-          />
-        )}
-        {activeViewerCert && activeViewerCert.type === 'image' && (
-          <ImageLightbox cert={activeViewerCert} onClose={handleClose} />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
