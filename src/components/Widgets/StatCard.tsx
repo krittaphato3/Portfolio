@@ -129,8 +129,8 @@ export function StatCard({
   return (
     <motion.div
       ref={cardRef}
-      whileHover={{ scale: 1.02, y: -4 }}
-      transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
+      whileHover={{ scale: 1.02, y: -3 }}
+      transition={{ type: 'spring' as const, stiffness: 300, damping: 25 }}
       className="relative p-6 bg-gradient-to-br from-bg-elevated to-bg-card rounded-2xl border border-border-subtle hover:border-border-default transition-all duration-500 group overflow-hidden"
     >
       {/* Animated background orbs */}
@@ -163,7 +163,7 @@ export function StatCard({
         </div>
         <motion.div
           whileHover={{ rotate: 12, scale: 1.1 }}
-          transition={{ type: 'spring' as const, stiffness: 400, damping: 15 }}
+          transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
           className={`p-3 rounded-xl ${colors.bg} ${colors.glow}`}
         >
           <Icon className={`w-6 h-6 ${colors.icon}`} />

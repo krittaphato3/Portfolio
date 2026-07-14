@@ -35,7 +35,7 @@ export function Footer() {
               href="https://github.com/krittaphato3"
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ scale: 1.1, y: -1 }}
+              whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
               whileTap={{ scale: 0.95 }}
               className="text-text-muted hover:text-text-primary transition-colors"
               aria-label="GitHub"

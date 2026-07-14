@@ -92,7 +92,7 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
             href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            whileHover={{ scale: 1.1, y: -2 }}
+            whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
             whileTap={{ scale: 0.95 }}
             className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-border-default hover:bg-bg-hover transition-all"
             aria-label="GitHub"

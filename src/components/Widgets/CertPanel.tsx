@@ -202,7 +202,7 @@ function CertCard({
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={isInView ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
       transition={{ delay: index * 0.04, type: 'spring', stiffness: 260, damping: 24 }}
-      whileHover={{ scale: 1.02, y: -4 }}
+      whileHover={{ scale: 1.02, y: -3, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
       className={`
         group relative rounded-xl border border-border-subtle
         hover:border-primary-cyan/30 transition-all duration-300
@@ -231,7 +231,7 @@ function CertCard({
           <img
             src={imageUrl}
             alt={cert.description}
-            className="w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300 group-hover:scale-[1.02] transition-transform duration-500"
+            className="w-full h-full object-contain opacity-70 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-500"
             loading="lazy"
             onError={e => {
               const target = e.target as HTMLImageElement;

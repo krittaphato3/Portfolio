@@ -46,7 +46,7 @@ function RepoCard({ repo, index, animationsEnabled }: RepoCardProps) {
       initial={{ opacity: 0, y: 20, scale: 0.98 }}
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.98 }}
       transition={{ delay: index * 0.08, type: 'spring', stiffness: 260, damping: 24 }}
-      whileHover={{ x: 4, y: -2, scale: 1.01 }}
+      whileHover={{ x: 3, y: -3, scale: 1.01, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
       whileTap={{ scale: 0.99 }}
       href={repo.url}
       target="_blank"

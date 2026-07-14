@@ -132,7 +132,7 @@ function SkillChip({ skill, styles, index, animationsEnabled }: SkillChipProps) 
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={isInView ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
       transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 25 }}
-      whileHover={{ scale: 1.06, y: -2, boxShadow: styles.glow }}
+      whileHover={{ scale: 1.05, y: -2, boxShadow: styles.glow, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
       className={`
         px-3 py-1.5 rounded-lg text-xs font-medium cursor-default
         ${styles.chipBg} ${styles.chipText}

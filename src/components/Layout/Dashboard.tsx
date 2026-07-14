@@ -1,4 +1,4 @@
-import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
 
@@ -76,8 +76,6 @@ const rowClasses: Record<number, string> = {
 export function BentoItem({ children, className = '', span }: BentoItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const { scrollY } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollY, [0, 1], [0, 20]);
 
   const colSpan = span?.col ?? 1;
   const rowSpan = span?.row ?? 1;
@@ -89,10 +87,9 @@ export function BentoItem({ children, className = '', span }: BentoItemProps) {
       initial="hidden"
       animate={isInView ? 'show' : 'hidden'}
       whileHover={{
-        y: -2,
-        transition: { type: 'spring' as const, stiffness: 400, damping: 25 },
+        y: -3,
+        transition: { type: 'spring' as const, stiffness: 300, damping: 25 },
       }}
-      style={{ y }}
       className={`
         ${spanClasses[colSpan]}
         ${rowClasses[rowSpan]}
