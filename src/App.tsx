@@ -20,6 +20,7 @@ import {
   fetchRepoCount,
   fetchPinnedRepos,
   fetchGitHubUser,
+  fetchGitHubEvents,
   type PinnedRepo,
   type GitHubUserProfile,
 } from './lib/github';
@@ -37,7 +38,7 @@ function App() {
   // GitHub data
   const [repoCount, setRepoCount] = useState(0);
   const [pinnedRepos, setPinnedRepos] = useState<PinnedRepo[]>([]);
-  const [pinnedUpdates, setPinnedUpdates] = useState<ActivityItem[]>([]);
+  const [githubEvents, setGithubEvents] = useState<ActivityItem[]>([]);
   const [githubProfile, setGithubProfile] = useState<GitHubUserProfile | null>(null);
 
   // Certificate data
@@ -84,38 +85,29 @@ function App() {
     return new Date().getFullYear() - joinYear;
   }, []);
 
-  // Derived: merge cert + pinned + github events, sorted by timestamp descending
+  // Derived: merge cert + real GitHub events, sorted by timestamp descending
   const recentUpdates = useMemo(
     () =>
-      [...certUpdates, ...pinnedUpdates]
+      [...certUpdates, ...githubEvents]
         .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-        .slice(0, 5),
-    [certUpdates, pinnedUpdates]
+        .slice(0, 8),
+    [certUpdates, githubEvents]
   );
 
   // Fetch GitHub data
   useEffect(() => {
     async function loadGitHub() {
       try {
-        const [count, pinned, profile] = await Promise.all([
+        const [count, pinned, profile, events] = await Promise.all([
           fetchRepoCount(),
           fetchPinnedRepos(),
           fetchGitHubUser(),
+          fetchGitHubEvents(),
         ]);
         setRepoCount(count);
         setPinnedRepos(pinned);
         setGithubProfile(profile);
-
-        // Build recent updates from pinned repos using pushed_at when available
-        const updates: ActivityItem[] = pinned.slice(0, 4).map((repo) => ({
-          id: `pin-${repo.name}`,
-          type: 'feature' as const,
-          title: `Pinned: ${repo.name}`,
-          description: repo.description || 'Featured project on profile',
-          timestamp: repo.pushedAt ? new Date(repo.pushedAt) : new Date(),
-          url: repo.url,
-        }));
-        setPinnedUpdates(updates);
+        setGithubEvents(events);
       } catch {
         showToast(
           'Could not load GitHub data. Check your connection or token.',
