@@ -15,6 +15,7 @@ import {
   ZoomOut,
 } from 'lucide-react';
 import { PdfViewer } from '../UI/PdfViewer';
+import { useSettings } from '../../hooks/useSettings';
 import type { Certificate, CategoryData } from '../../lib/types';
 
 /* ----------------------------------------------------------------
@@ -286,6 +287,7 @@ export function CertPanel({
   const [expanded, setExpanded] = useState(false);
   const [gridSize, setGridSize] = useState<GridSize>('medium');
   const [viewerCert, setViewerCert] = useState<Certificate | null>(null);
+  const { settings } = useSettings();
 
   const allCerts = useMemo(
     () => categories.flatMap(cat => cat.certificates),
@@ -303,7 +305,7 @@ export function CertPanel({
   );
 
   const hasMore = filteredCerts.length > limit;
-  const compact = gridSize === 'small';
+  const compact = settings.display.compactMode || gridSize === 'small';
 
   const handleOpen = (cert: Certificate) => {
     setViewerCert(cert);

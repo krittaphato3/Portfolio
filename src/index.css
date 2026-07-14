@@ -38,6 +38,25 @@
 }
 
 /* ============================================================
+   LIGHT MODE OVERRIDES
+   ============================================================ */
+.light {
+  --color-bg-dark: #fafafa;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #f4f4f5;
+  --color-bg-hover: #e4e4e7;
+  --color-border-subtle: #e4e4e7;
+  --color-border-default: #d4d4d8;
+  --color-text-primary: #09090b;
+  --color-text-secondary: #52525b;
+  --color-text-muted: #71717a;
+  --color-text-dim: #a1a1aa;
+  --color-glass: rgba(0, 0, 0, 0.03);
+  --color-glass-border: rgba(0, 0, 0, 0.06);
+  --color-glass-hover: rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================================
    KEYFRAMES
    ============================================================ */
 @keyframes fade-in {
@@ -70,9 +89,14 @@
 }
 
 html {
+  color-scheme: dark;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+html.light {
+  color-scheme: light;
 }
 
 body {

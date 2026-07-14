@@ -1,3 +1,5 @@
+import type { ActivityItem } from './types';
+
 const GITHUB_USERNAME = 'krittaphato3';
 const GITHUB_API = 'https://api.github.com';
 
@@ -207,5 +209,48 @@ function getLanguageColor(lang: string): string {
     Shell: '#89e051',
   };
   return colors[lang] || '#8b8b8b';
+}
+
+// Fetch recent GitHub public events (Push, Create, Deployment, Release)
+export async function fetchGitHubEvents(): Promise<ActivityItem[]> {
+  try {
+    const res = await fetch(
+      `${GITHUB_API}/users/${GITHUB_USERNAME}/events/public?per_page=10`
+    );
+    if (!res.ok) return [];
+
+    const events: any[] = await res.json();
+
+    return events
+      .filter((e: any) =>
+        ['PushEvent', 'CreateEvent', 'DeploymentStatusEvent', 'ReleaseEvent'].includes(e.type)
+      )
+      .slice(0, 5)
+      .map((e: any): ActivityItem => {
+        const typeMap: Record<string, ActivityItem['type']> = {
+          PushEvent: 'commit',
+          CreateEvent: 'project',
+          DeploymentStatusEvent: 'action',
+          ReleaseEvent: 'action',
+        };
+        return {
+          id: e.id,
+          type: typeMap[e.type] || 'update',
+          title:
+            e.type === 'PushEvent'
+              ? `Pushed to ${e.repo.name}`
+              : e.type === 'CreateEvent'
+                ? `Created ${e.payload.ref_type || 'repository'}`
+                : `Activity on ${e.repo.name}`,
+          description:
+            e.type === 'PushEvent' && e.payload.commits?.[0]
+              ? e.payload.commits[0].message.split('\n')[0]
+              : e.repo.name,
+          timestamp: new Date(e.created_at),
+        };
+      });
+  } catch {
+    return [];
+  }
 }
 

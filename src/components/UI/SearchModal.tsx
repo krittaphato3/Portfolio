@@ -41,6 +41,7 @@ const defaultItems: SearchItem[] = [
     title: 'Dashboard',
     description: 'Main portfolio overview',
     category: 'page',
+    url: '#dashboard',
     icon: <Folder className="w-4 h-4" />,
   },
   {
@@ -48,6 +49,7 @@ const defaultItems: SearchItem[] = [
     title: 'Certifications',
     description: 'Professional credentials',
     category: 'page',
+    url: '#certifications',
     icon: <Award className="w-4 h-4" />,
   },
   {
@@ -55,6 +57,7 @@ const defaultItems: SearchItem[] = [
     title: 'Projects',
     description: 'GitHub pinned repositories',
     category: 'project',
+    url: '#projects',
     icon: <Folder className="w-4 h-4" />,
   },
   {
@@ -62,6 +65,7 @@ const defaultItems: SearchItem[] = [
     title: 'Settings',
     description: 'Theme, notifications, display',
     category: 'setting',
+    url: '#settings',
     icon: <Settings className="w-4 h-4" />,
   },
   {
@@ -69,6 +73,7 @@ const defaultItems: SearchItem[] = [
     title: 'Skills & Technologies',
     description: 'Technical proficiency overview',
     category: 'page',
+    url: '#skills',
     icon: <FileText className="w-4 h-4" />,
   },
 ];
@@ -214,7 +219,13 @@ export function SearchModal({ open, onClose, items }: SearchModalProps) {
         case 'Enter':
           e.preventDefault();
           if (results[activeIndex]?.url) {
-            window.open(results[activeIndex].url, '_blank', 'noopener,noreferrer');
+            const url = results[activeIndex].url!;
+            if (url.startsWith('#')) {
+              const el = document.querySelector(url);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+              window.open(url, '_blank', 'noopener,noreferrer');
+            }
             onClose();
           }
           break;
@@ -305,7 +316,12 @@ export function SearchModal({ open, onClose, items }: SearchModalProps) {
                         onMouseEnter={() => setActiveIndex(index)}
                         onClick={() => {
                           if (item.url) {
-                            window.open(item.url, '_blank', 'noopener,noreferrer');
+                            if (item.url.startsWith('#')) {
+                              const el = document.querySelector(item.url);
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            } else {
+                              window.open(item.url, '_blank', 'noopener,noreferrer');
+                            }
                           }
                           onClose();
                         }}

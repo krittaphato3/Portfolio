@@ -18,6 +18,7 @@ import { loadSkillsFromYaml } from './lib/skills';
 import {
   fetchRepoCount,
   fetchPinnedRepos,
+  fetchGitHubEvents,
   type PinnedRepo,
 } from './lib/github';
 import { defaultSettings, type SettingsState } from './components/UI/SettingsPanel';
@@ -37,6 +38,9 @@ function App() {
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [certCount, setCertCount] = useState(0);
   const [certUpdates, setCertUpdates] = useState<ActivityItem[]>([]);
+
+  // GitHub events
+  const [githubEvents, setGithubEvents] = useState<ActivityItem[]>([]);
 
   // Skills from YAML
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -77,22 +81,27 @@ function App() {
     return new Date().getFullYear() - joinYear;
   }, []);
 
-  // Derived: merge cert + pinned updates (Fix 3: no race condition)
+  // Derived: merge cert + pinned + github events, sorted by timestamp descending
   const recentUpdates = useMemo(
-    () => [...certUpdates, ...pinnedUpdates].slice(0, 5),
-    [certUpdates, pinnedUpdates]
+    () =>
+      [...certUpdates, ...pinnedUpdates, ...githubEvents]
+        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+        .slice(0, 5),
+    [certUpdates, pinnedUpdates, githubEvents]
   );
 
   // Fetch GitHub data
   useEffect(() => {
     async function loadGitHub() {
       try {
-        const [count, pinned] = await Promise.all([
+        const [count, pinned, events] = await Promise.all([
           fetchRepoCount(),
           fetchPinnedRepos(),
+          fetchGitHubEvents(),
         ]);
         setRepoCount(count);
         setPinnedRepos(pinned);
+        setGithubEvents(events);
 
         // Build recent updates from pinned repos using pushed_at when available
         const updates: ActivityItem[] = pinned.slice(0, 4).map((repo) => ({

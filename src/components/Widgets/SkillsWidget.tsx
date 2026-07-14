@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Code2, Database, Palette, Wrench } from 'lucide-react';
 import type { Skill } from '../../lib/types';
+import { useSettings } from '../../hooks/useSettings';
 
 interface SkillsWidgetProps {
   skills: Skill[];
@@ -46,6 +47,9 @@ const categoryStyles = {
 } as const;
 
 export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
+  const { settings } = useSettings();
+  const animationsEnabled = settings.display.animations;
+
   // Group skills by category
   const grouped = skills.reduce(
     (acc, skill) => {
@@ -92,26 +96,33 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {catSkills.map((skill, index) => (
-                <motion.div
-                  key={skill.name}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.03 }}
-                  whileHover={{ scale: 1.06 }}
-                  className={`
-                    px-3 py-1.5 rounded-lg text-xs font-medium cursor-default
-                    ${styles.chipBg} ${styles.chipText}
-                    border ${styles.chipBorder}
-                    ${styles.chipHover} transition-colors duration-200
-                  `}
-                >
-                  {skill.name}
-                  <span className="ml-1.5 text-text-dim opacity-70">
-                    {skill.level}%
-                  </span>
-                </motion.div>
-              ))}
+              {catSkills.map((skill, index) => {
+                const motionProps = animationsEnabled
+                  ? {
+                      initial: { opacity: 0, scale: 0.8 },
+                      animate: { opacity: 1, scale: 1 },
+                      transition: { delay: index * 0.03 },
+                      whileHover: { scale: 1.06 },
+                    }
+                  : {};
+                return (
+                  <motion.div
+                    key={skill.name}
+                    {...motionProps}
+                    className={`
+                      px-3 py-1.5 rounded-lg text-xs font-medium cursor-default
+                      ${styles.chipBg} ${styles.chipText}
+                      border ${styles.chipBorder}
+                      ${styles.chipHover} transition-colors duration-200
+                    `}
+                  >
+                    {skill.name}
+                    <span className="ml-1.5 text-text-dim opacity-70">
+                      {skill.level}%
+                    </span>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         );
