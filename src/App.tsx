@@ -12,7 +12,6 @@ import { SkillsWidget } from './components/Widgets/SkillsWidget';
 import { ActivityFeed } from './components/Widgets/ActivityFeed';
 import { ProjectsWidget } from './components/Widgets/ProjectsWidget';
 import { SystemStatusWidget } from './components/Widgets/SystemStatusWidget';
-import { GitHubGraph } from './components/Widgets/GitHubGraph';
 import { useToast } from './components/UI/Toast';
 import { SettingsProvider } from './hooks/useSettings';
 import { Folder, Award, Code2, Rocket } from 'lucide-react';
@@ -312,11 +311,6 @@ function App() {
                           onCertOpen={handleCertClick}
                         />
                       </div>
-                    </BentoItem>
-
-                    {/* Row 5: GitHub Contribution Graph */}
-                    <BentoItem span={{ col: 4, row: 1 }}>
-                      <GitHubGraph />
                     </BentoItem>
                   </Dashboard>
                 </div>
