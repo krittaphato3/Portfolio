@@ -34,7 +34,7 @@ export function applyTheme(theme: Theme): void {
   root.style.colorScheme = resolved;
 }
 
-export function initTheme(): Theme {
+export function initTheme(): { theme: Theme; cleanup: () => void } {
   const theme = getStoredTheme();
   applyTheme(theme);
 
@@ -45,5 +45,10 @@ export function initTheme(): Theme {
     }
   };
   mq.addEventListener('change', handler);
-  return theme;
+  return {
+    theme,
+    cleanup: () => {
+      mq.removeEventListener('change', handler);
+    },
+  };
 }

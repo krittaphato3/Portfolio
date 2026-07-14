@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Dashboard, BentoItem } from './components/Layout/Dashboard';
 import { ProfileWidget } from './components/Widgets/ProfileWidget';
 import { StatCard } from './components/Widgets/StatCard';
-import { CertGrid } from './components/Widgets/CertGrid';
-import { CertFolder } from './components/Widgets/CertFolder';
+import { CertPanel } from './components/Widgets/CertPanel';
 import { SkillsWidget } from './components/Widgets/SkillsWidget';
 import { ActivityFeed } from './components/Widgets/ActivityFeed';
 import { ProjectsWidget } from './components/Widgets/ProjectsWidget';
 import { SystemStatusWidget } from './components/Widgets/SystemStatusWidget';
 import { useToast } from './components/UI/Toast';
+import { SettingsProvider } from './hooks/useSettings';
 import { Folder, Award, Code2, Rocket } from 'lucide-react';
 import type { Skill, ActivityItem, CategoryData } from './lib/types';
 import { getAllCertificates, getCertificateStats } from './lib/certificates';
@@ -20,6 +20,7 @@ import {
   fetchPinnedRepos,
   type PinnedRepo,
 } from './lib/github';
+import { defaultSettings, type SettingsState } from './components/UI/SettingsPanel';
 
 /* ============================================================
    APP COMPONENT
@@ -30,14 +31,33 @@ function App() {
   // GitHub data
   const [repoCount, setRepoCount] = useState(0);
   const [pinnedRepos, setPinnedRepos] = useState<PinnedRepo[]>([]);
-  const [recentUpdates, setRecentUpdates] = useState<ActivityItem[]>([]);
+  const [pinnedUpdates, setPinnedUpdates] = useState<ActivityItem[]>([]);
 
   // Certificate data
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [certCount, setCertCount] = useState(0);
+  const [certUpdates, setCertUpdates] = useState<ActivityItem[]>([]);
 
   // Skills from YAML
   const [skills, setSkills] = useState<Skill[]>([]);
+
+  // Settings state (lifted for context)
+  const [settings, setSettings] = useState<SettingsState>(() => {
+    const saved = localStorage.getItem('portfolio-settings');
+    if (saved) {
+      try {
+        return { ...defaultSettings, ...JSON.parse(saved) };
+      } catch {
+        return defaultSettings;
+      }
+    }
+    return defaultSettings;
+  });
+
+  // Persist settings to localStorage
+  useEffect(() => {
+    localStorage.setItem('portfolio-settings', JSON.stringify(settings));
+  }, [settings]);
 
   // Loading states
   const [loading, setLoading] = useState({
@@ -45,6 +65,23 @@ function App() {
     certs: true,
     skills: true,
   });
+
+  // Derived: unique languages count from skills
+  const languagesCount = useMemo(() => {
+    return new Set(skills.map((s) => s.name)).size;
+  }, [skills]);
+
+  // Derived: years coding from GitHub join date (fallback 5)
+  const yearsCoding = useMemo(() => {
+    const joinYear = 2021;
+    return new Date().getFullYear() - joinYear;
+  }, []);
+
+  // Derived: merge cert + pinned updates (Fix 3: no race condition)
+  const recentUpdates = useMemo(
+    () => [...certUpdates, ...pinnedUpdates].slice(0, 5),
+    [certUpdates, pinnedUpdates]
+  );
 
   // Fetch GitHub data
   useEffect(() => {
@@ -57,16 +94,16 @@ function App() {
         setRepoCount(count);
         setPinnedRepos(pinned);
 
-        // Build recent updates from pinned repos
+        // Build recent updates from pinned repos using pushed_at when available
         const updates: ActivityItem[] = pinned.slice(0, 4).map((repo) => ({
           id: `pin-${repo.name}`,
           type: 'feature' as const,
           title: `Pinned: ${repo.name}`,
           description: repo.description || 'Featured project on profile',
-          timestamp: new Date(), // Pinned repos don't have a timestamp
+          timestamp: repo.pushedAt ? new Date(repo.pushedAt) : new Date(),
           url: repo.url,
         }));
-        setRecentUpdates(updates);
+        setPinnedUpdates(updates);
       } catch (err) {
         showToast(
           'Could not load GitHub data. Check your connection or token.',
@@ -90,8 +127,8 @@ function App() {
         setCategories(cats);
         setCertCount(stats.total);
 
-        // Add cert updates to recent activity
-        const certUpdates: ActivityItem[] = cats
+        // Build cert updates into separate state (Fix 3)
+        const updates: ActivityItem[] = cats
           .flatMap((cat) =>
             cat.certificates.slice(0, 1).map((cert) => ({
               id: `cert-${cert.id}`,
@@ -104,10 +141,7 @@ function App() {
           .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
           .slice(0, 2);
 
-        setRecentUpdates((prev) => {
-          const combined = [...certUpdates, ...prev];
-          return combined.slice(0, 5);
-        });
+        setCertUpdates(updates);
       } catch (err) {
         showToast(
           'Could not load certificates. Check the config files in public/certs/.',
@@ -138,88 +172,85 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg-dark flex flex-col">
-      <Header />
+    <SettingsProvider settings={settings} updateSettings={setSettings}>
+      <div className="min-h-screen bg-bg-dark flex flex-col">
+        <Header settings={settings} onSettingsChange={setSettings} />
 
-      <main className="flex-1">
-        <Dashboard>
-          {/* Row 1: Profile + 3 Stats */}
-          <BentoItem span={{ col: 1, row: 2 }}>
-            <ProfileWidget />
-          </BentoItem>
+        <main className="flex-1">
+          <Dashboard>
+            {/* Row 1: Profile + 3 Stats */}
+            <BentoItem span={{ col: 1, row: 2 }}>
+              <ProfileWidget />
+            </BentoItem>
 
-          <BentoItem span={{ col: 1, row: 1 }}>
-            <StatCard
-              title="Total Projects"
-              value={repoCount}
-              icon={Folder}
-              color="cyan"
-              description="Public repositories"
-            />
-          </BentoItem>
+            <BentoItem span={{ col: 1, row: 1 }}>
+              <StatCard
+                title="Total Projects"
+                value={repoCount}
+                icon={Folder}
+                color="cyan"
+                description="Public repositories"
+              />
+            </BentoItem>
 
-          <BentoItem span={{ col: 1, row: 1 }}>
-            <StatCard
-              title="Certifications"
-              value={certCount}
-              icon={Award}
-              color="violet"
-              description="Professional credentials"
-            />
-          </BentoItem>
+            <BentoItem span={{ col: 1, row: 1 }}>
+              <StatCard
+                title="Certifications"
+                value={certCount}
+                icon={Award}
+                color="violet"
+                description="Professional credentials"
+              />
+            </BentoItem>
 
-          <BentoItem span={{ col: 1, row: 1 }}>
-            <StatCard
-              title="Languages"
-              value={17}
-              icon={Code2}
-              color="emerald"
-              description="Technologies used"
-            />
-          </BentoItem>
+            <BentoItem span={{ col: 1, row: 1 }}>
+              <StatCard
+                title="Languages"
+                value={languagesCount || 17}
+                icon={Code2}
+                color="emerald"
+                description="Technologies used"
+              />
+            </BentoItem>
 
-          {/* Row 2: Feature Work (spans 2 cols) + Recent Updates (spans 2 cols) */}
-          <BentoItem span={{ col: 2, row: 1 }}>
-            <ProjectsWidget repos={pinnedRepos} loading={loading.github} />
-          </BentoItem>
+            {/* Row 2: Feature Work (spans 2 cols) + Recent Updates (spans 2 cols) */}
+            <BentoItem span={{ col: 2, row: 1 }}>
+              <ProjectsWidget repos={pinnedRepos} loading={loading.github} />
+            </BentoItem>
 
-          <BentoItem span={{ col: 2, row: 1 }}>
-            <ActivityFeed activities={recentUpdates} loading={loading.github || loading.certs} />
-          </BentoItem>
+            <BentoItem span={{ col: 2, row: 1 }}>
+              <ActivityFeed activities={recentUpdates} loading={loading.github || loading.certs} />
+            </BentoItem>
 
-          {/* Row 3: Skills (spans 2 cols) + Tech Proficiency (spans 1) + Deploy (spans 1) */}
-          <BentoItem span={{ col: 2, row: 1 }}>
-            <SkillsWidget skills={skills.length > 0 ? skills : []} />
-          </BentoItem>
+            {/* Row 3: Skills (spans 2 cols) + Tech Proficiency (spans 1) + Deploy (spans 1) */}
+            <BentoItem span={{ col: 2, row: 1 }}>
+              <SkillsWidget skills={skills} />
+            </BentoItem>
 
-          <BentoItem span={{ col: 1, row: 1 }}>
-            <SystemStatusWidget />
-          </BentoItem>
+            <BentoItem span={{ col: 1, row: 1 }}>
+              <SystemStatusWidget />
+            </BentoItem>
 
-          <BentoItem span={{ col: 1, row: 1 }}>
-            <StatCard
-              title="Years Coding"
-              value={5}
-              icon={Rocket}
-              color="cyan"
-              description="Building projects"
-            />
-          </BentoItem>
+            <BentoItem span={{ col: 1, row: 1 }}>
+              <StatCard
+                title="Years Coding"
+                value={yearsCoding}
+                icon={Rocket}
+                color="cyan"
+                description="Building projects"
+              />
+            </BentoItem>
 
-          {/* Row 4: Certifications full width */}
-          <BentoItem span={{ col: 4, row: 1 }}>
-            <CertGrid categories={categories} loading={loading.certs} />
-          </BentoItem>
+            {/* Row 4: Certifications full width */}
+            <BentoItem span={{ col: 4, row: 1 }}>
+              <CertPanel categories={categories} loading={loading.certs} />
+            </BentoItem>
+          </Dashboard>
+        </main>
 
-          {/* Row 5: Certificate Folder (general certs view) */}
-          <BentoItem span={{ col: 4, row: 1 }}>
-            <CertFolder categories={categories} loading={loading.certs} />
-          </BentoItem>
-        </Dashboard>
-      </main>
-
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </SettingsProvider>
   );
 }
 

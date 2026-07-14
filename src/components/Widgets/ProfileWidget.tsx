@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, GitBranch, Link, AtSign } from 'lucide-react';
+import { MapPin, Calendar, GitBranch } from 'lucide-react';
 
 export function ProfileWidget() {
   return (
@@ -59,8 +59,6 @@ export function ProfileWidget() {
         >
           {[
             { icon: GitBranch, href: 'https://github.com/krittaphato3', label: 'GitHub' },
-            { icon: Link, href: '#', label: 'LinkedIn' },
-            { icon: AtSign, href: '#', label: 'Twitter' },
           ].map(({ icon: Icon, href, label }) => (
             <motion.a
               key={label}

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Command,
@@ -12,18 +12,30 @@ import {
 import { useThemeContext } from '../hooks/useTheme';
 import { SearchModal, useSearchShortcut } from './UI/SearchModal';
 import { NotificationsPanel, useSampleNotifications } from './UI/NotificationsPanel';
-import { SettingsPanel, defaultSettings, type SettingsState } from './UI/SettingsPanel';
+import { SettingsPanel, type SettingsState } from './UI/SettingsPanel';
 
-export function Header() {
+interface HeaderProps {
+  settings: SettingsState;
+  onSettingsChange: (settings: SettingsState) => void;
+}
+
+export function Header({ settings, onSettingsChange }: HeaderProps) {
   const { theme, setTheme } = useThemeContext();
-  const notifications = useSampleNotifications();
-  const [unreadCount] = useState(() => notifications.filter((n) => !n.read).length);
+  const [notifications, setNotifications] = useState(useSampleNotifications);
 
   // Panel state
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settings, setSettings] = useState<SettingsState>(defaultSettings);
+
+  // Sync settings.theme with theme context
+  useEffect(() => {
+    if (settings.theme !== theme) {
+      setTheme(settings.theme);
+    }
+  }, [settings.theme, theme, setTheme]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const toggleSearch = useCallback(() => {
     setSearchOpen((prev) => !prev);
@@ -40,7 +52,9 @@ export function Header() {
   const cycleTheme = () => {
     const order: Array<'dark' | 'light' | 'system'> = ['dark', 'light', 'system'];
     const idx = order.indexOf(theme);
-    setTheme(order[(idx + 1) % order.length]);
+    const next = order[(idx + 1) % order.length];
+    setTheme(next);
+    onSettingsChange({ ...settings, theme: next });
   };
 
   const ThemeIcon = theme === 'light' ? Sun : theme === 'system' ? Monitor : Moon;
@@ -102,8 +116,16 @@ export function Header() {
                 open={notifOpen}
                 onClose={handleNotifClose}
                 notifications={notifications}
-                onMarkRead={() => {}}
-                onMarkAllRead={() => {}}
+                onMarkRead={(id) =>
+                  setNotifications((prev) =>
+                    prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+                  )
+                }
+                onMarkAllRead={() =>
+                  setNotifications((prev) =>
+                    prev.map((n) => ({ ...n, read: true }))
+                  )
+                }
               />
             </div>
 
@@ -142,7 +164,7 @@ export function Header() {
         open={settingsOpen}
         onClose={handleSettingsClose}
         settings={settings}
-        onSettingsChange={setSettings}
+        onSettingsChange={onSettingsChange}
       />
     </>
   );

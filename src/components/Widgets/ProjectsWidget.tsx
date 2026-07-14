@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Pin, ExternalLink, Star, GitFork, Code2, ArrowUpRight } from 'lucide-react';
+import { Pin, ExternalLink, Star, GitFork, ArrowUpRight } from 'lucide-react';
 import type { PinnedRepo } from '../../lib/github';
 
 interface ProjectsWidgetProps {
@@ -103,13 +103,6 @@ export function ProjectsWidget({ repos, loading }: ProjectsWidgetProps) {
                     )}
                   </div>
                   <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                    <motion.span
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      aria-label={`Code for ${repo.name}`}
-                    >
-                      <Code2 className="w-4 h-4 text-text-dim group-hover:text-text-primary transition-colors" />
-                    </motion.span>
                     {repo.homepageUrl && (
                       <motion.a
                         href={repo.homepageUrl}

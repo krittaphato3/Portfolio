@@ -40,6 +40,7 @@ export interface PinnedRepo {
   forkCount: number;
   isArchived: boolean;
   isFork: boolean;
+  pushedAt?: string;
   primaryLanguage: {
     name: string;
     color: string;
@@ -98,6 +99,7 @@ export async function fetchPinnedRepos(): Promise<PinnedRepo[]> {
               forkCount
               isArchived
               isFork
+              pushedAt
               primaryLanguage {
                 name
                 color
@@ -168,6 +170,7 @@ async function fetchRecentReposAsPinned(): Promise<PinnedRepo[]> {
       forkCount: r.forks_count,
       isArchived: false,
       isFork: false,
+      pushedAt: r.pushed_at,
       primaryLanguage: r.language
         ? { name: r.language, color: getLanguageColor(r.language) }
         : null,
@@ -206,44 +209,3 @@ function getLanguageColor(lang: string): string {
   return colors[lang] || '#8b8b8b';
 }
 
-// Fetch recent activity (repos sorted by recent push)
-export async function fetchRecentActivity(): Promise<
-  Array<{
-    id: string;
-    type: 'project' | 'update';
-    title: string;
-    description: string;
-    timestamp: Date;
-    url: string;
-  }>
-> {
-  const res = await fetch(
-    `${GITHUB_API}/users/${GITHUB_USERNAME}/events/public?per_page=10`
-  );
-  if (!res.ok) return [];
-
-  const events = await res.json();
-
-  return events
-    .filter(
-      (e: { type: string }) =>
-        e.type === 'PushEvent' ||
-        e.type === 'CreateEvent' ||
-        e.type === 'PublicEvent'
-    )
-    .slice(0, 5)
-    .map((e: { id: string; type: string; repo: { name: string }; created_at: string; payload: { ref_type?: string; ref?: string; commits?: Array<{ message: string }> } }) => ({
-      id: e.id,
-      type: e.type === 'PushEvent' ? ('project' as const) : ('update' as const),
-      title:
-        e.type === 'CreateEvent'
-          ? `Created ${e.payload.ref_type || 'repository'}`
-          : `Updated ${e.repo.name}`,
-      description:
-        e.type === 'PushEvent' && e.payload.commits?.[0]
-          ? e.payload.commits[0].message.split('\n')[0]
-          : e.repo.name,
-      timestamp: new Date(e.created_at),
-      url: `https://github.com/${e.repo.name}`,
-    }));
-}

@@ -223,22 +223,6 @@ export function SearchModal({ open, onClose, items }: SearchModalProps) {
     [results, activeIndex, onClose]
   );
 
-  // Global keyboard shortcut: Cmd+K / Ctrl+K
-  useEffect(() => {
-    function handleGlobalKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        if (open) {
-          onClose();
-        } else {
-          // Signal parent to open — handled by the parent via useSearchShortcut
-        }
-      }
-    }
-    window.addEventListener('keydown', handleGlobalKey);
-    return () => window.removeEventListener('keydown', handleGlobalKey);
-  }, [open, onClose]);
-
   return (
     <AnimatePresence>
       {open && (

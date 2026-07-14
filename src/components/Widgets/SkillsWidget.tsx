@@ -4,6 +4,7 @@ import type { Skill } from '../../lib/types';
 
 interface SkillsWidgetProps {
   skills: Skill[];
+  loading?: boolean;
 }
 
 const categoryIcons = {
@@ -44,7 +45,7 @@ const categoryStyles = {
   },
 } as const;
 
-export function SkillsWidget({ skills }: SkillsWidgetProps) {
+export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
   // Group skills by category
   const grouped = skills.reduce(
     (acc, skill) => {
@@ -53,6 +54,69 @@ export function SkillsWidget({ skills }: SkillsWidgetProps) {
       return acc;
     },
     {} as Record<string, Skill[]>
+  );
+
+  const content = loading ? (
+    <div className="space-y-4">
+      {[1, 2, 3].map((i) => (
+        <div key={i}>
+          <div className="h-3 w-16 bg-bg-elevated rounded mb-2.5 animate-pulse" />
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 4 }).map((_, j) => (
+              <div key={j} className="h-7 w-20 bg-bg-elevated rounded-lg animate-pulse" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : Object.keys(grouped).length === 0 ? (
+    <div className="py-8 text-center">
+      <Code2 className="w-8 h-8 mx-auto mb-3 text-text-dim" />
+      <p className="text-sm text-text-muted">No skills loaded yet.</p>
+    </div>
+  ) : (
+    <div className="space-y-5">
+      {Object.entries(grouped).map(([category, catSkills]) => {
+        const Icon = categoryIcons[category as keyof typeof categoryIcons];
+        const styles =
+          categoryStyles[category as keyof typeof categoryStyles];
+
+        if (!Icon || !styles) return null;
+
+        return (
+          <div key={category}>
+            <div className="flex items-center gap-2 mb-2.5">
+              <Icon className={`w-4 h-4 ${styles.iconColor}`} />
+              <span className="text-xs text-text-secondary capitalize font-medium">
+                {category}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {catSkills.map((skill, index) => (
+                <motion.div
+                  key={skill.name}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.03 }}
+                  whileHover={{ scale: 1.06 }}
+                  className={`
+                    px-3 py-1.5 rounded-lg text-xs font-medium cursor-default
+                    ${styles.chipBg} ${styles.chipText}
+                    border ${styles.chipBorder}
+                    ${styles.chipHover} transition-colors duration-200
+                  `}
+                >
+                  {skill.name}
+                  <span className="ml-1.5 text-text-dim opacity-70">
+                    {skill.level}%
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 
   return (
@@ -67,48 +131,7 @@ export function SkillsWidget({ skills }: SkillsWidgetProps) {
         </div>
       </div>
 
-      <div className="space-y-5">
-        {Object.entries(grouped).map(([category, catSkills]) => {
-          const Icon = categoryIcons[category as keyof typeof categoryIcons];
-          const styles =
-            categoryStyles[category as keyof typeof categoryStyles];
-
-          if (!Icon || !styles) return null;
-
-          return (
-            <div key={category}>
-              <div className="flex items-center gap-2 mb-2.5">
-                <Icon className={`w-4 h-4 ${styles.iconColor}`} />
-                <span className="text-xs text-text-secondary capitalize font-medium">
-                  {category}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {catSkills.map((skill, index) => (
-                  <motion.div
-                    key={skill.name}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.03 }}
-                    whileHover={{ scale: 1.06 }}
-                    className={`
-                      px-3 py-1.5 rounded-lg text-xs font-medium cursor-default
-                      ${styles.chipBg} ${styles.chipText}
-                      border ${styles.chipBorder}
-                      ${styles.chipHover} transition-colors duration-200
-                    `}
-                  >
-                    {skill.name}
-                    <span className="ml-1.5 text-text-dim opacity-70">
-                      {skill.level}%
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {content}
     </div>
   );
 }

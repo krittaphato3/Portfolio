@@ -38,7 +38,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    initTheme();
+    const { cleanup } = initTheme();
     const stored = getStoredTheme();
     setThemeState(stored);
     setResolved(computeResolved(stored));
@@ -53,6 +53,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mq.removeEventListener('change', handler);
+      cleanup();
     };
   }, []);
 

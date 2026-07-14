@@ -41,6 +41,7 @@ export interface Certificate {
   date: string;
   category: string;
   categorySlug: string;
+  type: 'image' | 'pdf';
 }
 
 export interface CertificateConfig {

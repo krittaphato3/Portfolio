@@ -14,11 +14,18 @@ const categoryNames: Record<string, string> = {
   'system-analyst': 'System Analyst',
 };
 
+const PDF_EXTENSIONS = new Set(['.pdf']);
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
+}
+
+function detectFileType(filename: string): 'image' | 'pdf' {
+  const ext = filename.slice(filename.lastIndexOf('.')).toLowerCase();
+  return PDF_EXTENSIONS.has(ext) ? 'pdf' : 'image';
 }
 
 export async function getAllCertificates(): Promise<CategoryData[]> {
@@ -42,17 +49,23 @@ export async function getAllCertificates(): Promise<CategoryData[]> {
         (cert) => cert && cert.description && cert.link
       );
 
-      const certificates: Certificate[] = validCerts.map((cert, index) => ({
-        id: `${categorySlug}-${index}`,
-        image: cert.image,
-        imageUrl: cert.image ? `/certs/${categoryName}/${cert.image}` : '',
-        link: cert.link,
-        description: cert.description,
-        issuer: cert.issuer || 'Unknown',
-        date: cert.date || '',
-        category: categoryName,
-        categorySlug,
-      }));
+      const certificates: Certificate[] = validCerts.map((cert, index) => {
+        const imageUrl = cert.image ? `/certs/${categoryName}/${cert.image}` : '';
+        const fileType = cert.image ? detectFileType(cert.image) : 'image';
+
+        return {
+          id: `${categorySlug}-${index}`,
+          image: cert.image,
+          imageUrl,
+          link: cert.link,
+          description: cert.description,
+          issuer: cert.issuer || 'Unknown',
+          date: cert.date || '',
+          category: categoryName,
+          categorySlug,
+          type: fileType,
+        };
+      });
 
       categories.push({
         name: categoryNames[categorySlug] || categoryName,

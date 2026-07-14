@@ -24,19 +24,17 @@ export function Footer() {
 
           <div className="flex items-center gap-6">
             <a
-              href="#"
+              href="https://github.com/krittaphato3"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm text-text-muted hover:text-text-primary transition-colors"
             >
-              Privacy
-            </a>
-            <a
-              href="#"
-              className="text-sm text-text-muted hover:text-text-primary transition-colors"
-            >
-              Terms
+              GitHub
             </a>
             <motion.a
-              href="#"
+              href="https://github.com/krittaphato3"
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.1, y: -1 }}
               whileTap={{ scale: 0.95 }}
               className="text-text-muted hover:text-text-primary transition-colors"

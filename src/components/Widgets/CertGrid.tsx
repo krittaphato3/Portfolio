@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import { Award, ExternalLink, ChevronRight, FileImage } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Award, ExternalLink, FileImage } from 'lucide-react';
 import type { CategoryData } from '../../lib/types';
 
 // Sanitize URLs to prevent javascript: URI XSS
@@ -42,6 +42,12 @@ export function CertGrid({ categories, loading }: CertGridProps) {
     categories[0]?.slug || ''
   );
 
+  useEffect(() => {
+    if (categories.length > 0 && !categories.find((c) => c.slug === activeCategory)) {
+      setActiveCategory(categories[0].slug);
+    }
+  }, [categories, activeCategory]);
+
   const activeCerts =
     categories.find((c) => c.slug === activeCategory)?.certificates || [];
 
@@ -58,12 +64,6 @@ export function CertGrid({ categories, loading }: CertGridProps) {
             <p className="text-xs text-text-muted">Professional credentials</p>
           </div>
         </div>
-        <motion.button
-          whileHover={{ x: 3 }}
-          className="flex items-center gap-1 text-xs text-primary-cyan hover:text-primary-cyan/80 transition-colors"
-        >
-          View All <ChevronRight className="w-4 h-4" />
-        </motion.button>
       </div>
 
       {/* Category Tabs */}
