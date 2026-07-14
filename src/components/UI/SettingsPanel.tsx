@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -8,9 +8,7 @@ import {
   Bell,
   BellOff,
   Minimize2,
-  Maximize2,
   Sparkles,
-  Ban,
   Palette,
   Layout,
 } from 'lucide-react';

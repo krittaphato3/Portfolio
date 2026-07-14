@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import {
   Award,
   ExternalLink,
@@ -190,16 +190,19 @@ function CertCard({
   index: number;
   onOpen: () => void;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
   const imageUrl = safeImageUrl(cert.imageUrl);
-  const linkUrl = safeUrl(cert.link);
+  const _linkUrl = safeUrl(cert.link);
   const isPdf = cert.type === 'pdf';
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.04 }}
-      whileHover={{ scale: 1.02, y: -2 }}
+      ref={ref}
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={isInView ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
+      transition={{ delay: index * 0.04, type: 'spring', stiffness: 260, damping: 24 }}
+      whileHover={{ scale: 1.02, y: -4 }}
       className={`
         group relative rounded-xl border border-border-subtle
         hover:border-primary-cyan/30 transition-all duration-300
@@ -228,7 +231,7 @@ function CertCard({
           <img
             src={imageUrl}
             alt={cert.description}
-            className="w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+            className="w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300 group-hover:scale-[1.02] transition-transform duration-500"
             loading="lazy"
             onError={e => {
               const target = e.target as HTMLImageElement;
@@ -273,6 +276,14 @@ function CertCard({
       <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
         <div className="absolute inset-0 rounded-xl shadow-[inset_0_0_30px_rgba(6,182,212,0.08)]" />
       </div>
+
+      {/* Hover glow effect */}
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        whileHover={{ scale: 1, opacity: 0.15 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+        className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary-cyan/20 via-transparent to-primary-violet/20 pointer-events-none"
+      />
     </motion.div>
   );
 }

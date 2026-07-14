@@ -3,6 +3,42 @@ import type { ActivityItem } from './types';
 const GITHUB_USERNAME = 'krittaphato3';
 const GITHUB_API = 'https://api.github.com';
 
+// GitHub User Profile types
+export interface GitHubUserProfile {
+  login: string;
+  id: number;
+  node_id: string;
+  avatar_url: string;
+  gravatar_id: string;
+  url: string;
+  html_url: string;
+  followers_url: string;
+  following_url: string;
+  gists_url: string;
+  starred_url: string;
+  subscriptions_url: string;
+  organizations_url: string;
+  repos_url: string;
+  events_url: string;
+  received_events_url: string;
+  type: string;
+  site_admin: boolean;
+  name: string | null;
+  company: string | null;
+  blog: string | null;
+  location: string | null;
+  email: string | null;
+  hireable: boolean | null;
+  bio: string | null;
+  twitter_username: string | null;
+  public_repos: number;
+  public_gists: number;
+  followers: number;
+  following: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // GitHub REST API types
 export interface GitHubUser {
   login: string;
@@ -65,7 +101,7 @@ export interface PinnedRepo {
 }
 
 // Fetch GitHub user profile (unauthenticated, 60 req/hour limit)
-export async function fetchGitHubUser(): Promise<GitHubUser> {
+export async function fetchGitHubUser(): Promise<GitHubUserProfile> {
   const res = await fetch(`${GITHUB_API}/users/${GITHUB_USERNAME}`);
   if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
   return res.json();

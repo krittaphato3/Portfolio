@@ -1,7 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { Activity, Award, Pin, Folder, Sparkles, Plus, MapPin, ExternalLink } from 'lucide-react';
 import type { ActivityItem } from '../../lib/types';
 import { useSettings } from '../../hooks/useSettings';
+import { useRef } from 'react';
 
 interface ActivityFeedProps {
   activities: ActivityItem[];
@@ -59,7 +60,7 @@ function relativeTime(date: Date): string {
 
   const days = Math.floor(hours / 24);
   if (days === 1) return 'yesterday';
-  if (days < 7) return `${days} days ago`;
+  if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`;
 
   const weeks = Math.floor(days / 7);
   if (weeks < 4) return `${weeks} week${weeks === 1 ? '' : 's'} ago`;
@@ -71,6 +72,96 @@ function relativeTime(date: Date): string {
   return `${years} year${years === 1 ? '' : 's'} ago`;
 }
 
+function ActivityItemComponent({ activity, index, isFirst, isLast, animationsEnabled }: {
+  activity: ActivityItem;
+  index: number;
+  isFirst: boolean;
+  isLast: boolean;
+  animationsEnabled: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const config = typeConfig[activity.type] || typeConfig.update;
+  const Icon = config.icon;
+
+  if (!animationsEnabled) {
+    return (
+      <div ref={ref} className="flex gap-3 group relative">
+        <ActivityItemContent activity={activity} config={config} Icon={Icon} isFirst={isFirst} isLast={isLast} />
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: -20 }}
+      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+      transition={{ delay: index * 0.08, type: 'spring', stiffness: 260, damping: 24 }}
+      className="flex gap-3 group relative"
+      layout
+    >
+      <ActivityItemContent activity={activity} config={config} Icon={Icon} isFirst={isFirst} isLast={isLast} />
+    </motion.div>
+  );
+}
+
+function ActivityItemContent({ activity, config, Icon, isFirst, isLast }: {
+  activity: ActivityItem;
+  config: typeof typeConfig[keyof typeof typeConfig];
+  Icon: React.ElementType;
+  isFirst: boolean;
+  isLast: boolean;
+}) {
+  return (
+    <>
+      {/* Timeline connector */}
+      {!isLast && (
+        <div
+          className="absolute left-[15px] top-[36px] w-[2px] h-[calc(100%-12px)]"
+          style={{
+            background: isFirst
+              ? 'linear-gradient(to bottom, var(--color-primary-emerald), var(--color-border-subtle))'
+              : 'var(--color-border-subtle)',
+          }}
+        />
+      )}
+
+      {/* Icon node */}
+      <div className="relative z-10 flex-shrink-0">
+        <div className={`p-2 rounded-lg ${config.bg} ring-4 ring-bg-card ${isFirst ? 'ring-2 ring-primary-emerald/20' : ''}`}>
+          <Icon className={`w-4 h-4 ${config.color}`} />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0 py-1 pb-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-sm text-text-primary font-medium">{activity.title}</p>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${config.bg} ${config.color} font-medium`}>
+            {config.label}
+          </span>
+        </div>
+        <p className="text-xs text-text-muted truncate mt-0.5">{activity.description}</p>
+        <div className="flex items-center gap-2 mt-1">
+          <time className="text-[11px] text-text-dim">{relativeTime(activity.timestamp)}</time>
+          {activity.url && (
+            <a
+              href={activity.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] text-text-dim hover:text-primary-cyan transition-colors inline-flex items-center gap-0.5"
+            >
+              <ExternalLink className="w-3 h-3" />
+              View
+            </a>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 export function ActivityFeed({
   activities,
   loading,
@@ -78,6 +169,7 @@ export function ActivityFeed({
   onPinRepo,
 }: ActivityFeedProps) {
   const { settings } = useSettings();
+  const animationsEnabled = settings.display.animations;
 
   const filteredActivities = activities.filter((activity) => {
     if (activity.type === 'cert' && !settings.notifications.certAlerts) return false;
@@ -142,78 +234,16 @@ export function ActivityFeed({
         </div>
       ) : (
         <div className="relative">
-          {filteredActivities.map((activity, index) => {
-            const config = typeConfig[activity.type] || typeConfig.update;
-            const Icon = config.icon;
-            const isFirst = index === 0;
-            const isLast = index === filteredActivities.length - 1;
-
-            return (
-              <motion.div
-                key={activity.id}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.08 }}
-                className="flex gap-3 group relative"
-              >
-                {/* Timeline connector */}
-                {!isLast && (
-                  <div
-                    className="absolute left-[15px] top-[36px] w-[2px] h-[calc(100%-12px)]"
-                    style={{
-                      background: isFirst
-                        ? 'linear-gradient(to bottom, var(--color-primary-emerald), var(--color-border-subtle))'
-                        : 'var(--color-border-subtle)',
-                    }}
-                  />
-                )}
-
-                {/* Icon node */}
-                <div className="relative z-10 flex-shrink-0">
-                  <div
-                    className={`p-2 rounded-lg ${config.bg} ring-4 ring-bg-card ${
-                      isFirst ? 'ring-2 ring-primary-emerald/20' : ''
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${config.color}`} />
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0 py-1 pb-4">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm text-text-primary font-medium">
-                      {activity.title}
-                    </p>
-                    <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded-full ${config.bg} ${config.color} font-medium`}
-                    >
-                      {config.label}
-                    </span>
-                  </div>
-                  <p className="text-xs text-text-muted truncate mt-0.5">
-                    {activity.description}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <time className="text-[11px] text-text-dim">
-                      {relativeTime(activity.timestamp)}
-                    </time>
-                    {activity.url && (
-                      <a
-                        href={activity.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[11px] text-text-dim hover:text-primary-cyan transition-colors inline-flex items-center gap-0.5"
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        View
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+          {filteredActivities.map((activity, index) => (
+            <ActivityItemComponent
+              key={activity.id}
+              activity={activity}
+              index={index}
+              isFirst={index === 0}
+              isLast={index === filteredActivities.length - 1}
+              animationsEnabled={animationsEnabled}
+            />
+          ))}
         </div>
       )}
     </div>

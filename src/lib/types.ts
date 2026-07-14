@@ -12,7 +12,7 @@ export interface Project {
 export interface Skill {
   name: string;
   level: number;
-  category: 'frontend' | 'backend' | 'tools' | 'design';
+  category: 'frontend' | 'backend' | 'systems' | 'security' | 'ai' | 'design' | 'tools';
 }
 
 export interface ActivityItem {

@@ -25,6 +25,8 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
   const defaultNotifications = useSampleNotifications();
   const [notifications, setNotifications] = useState(defaultNotifications);
 
+  // Skip link for accessibility
+  const [_skipLinkVisible, _setSkipLinkVisible] = useState(false);
 
   // Panel state
   const [searchOpen, setSearchOpen] = useState(false);
@@ -52,6 +54,22 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
 
   useSearchShortcut(toggleSearch);
 
+  // Handle focus for skip link
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        _setSkipLinkVisible(true);
+      }
+    };
+    const handleClick = () => _setSkipLinkVisible(false);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('click', handleClick);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClick);
+    };
+  }, []);
+
   const cycleTheme = () => {
     const order: Array<'dark' | 'light' | 'system'> = ['dark', 'light', 'system'];
     const idx = order.indexOf(theme);
@@ -64,11 +82,20 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
 
   return (
     <>
+      {/* Skip Link - Accessibility */}
+      <a
+        href="#main-content"
+        className={`sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary-cyan focus:text-white focus:rounded-lg focus:font-medium focus:outline-none focus:ring-2 focus:ring-primary-cyan focus:ring-offset-2 focus:ring-offset-bg-dark`}
+      >
+        Skip to main content
+      </a>
+
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring' as const, stiffness: 300, damping: 30 }}
         className="sticky top-0 z-50 glass-strong border-b border-glass-border"
+        role="banner"
       >
         <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Left: Logo */}
@@ -77,16 +104,17 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
               whileHover={{ rotate: -10, scale: 1.05 }}
               transition={{ type: 'spring' as const, stiffness: 400, damping: 15 }}
               className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-cyan to-primary-violet flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+              aria-hidden="true"
             >
               <Command className="w-4 h-4 text-white" />
             </motion.div>
-            <Link to="/" className="text-text-primary font-semibold text-sm hidden sm:block tracking-tight hover:text-primary-cyan transition-colors">
+            <Link to="/" className="text-text-primary font-semibold text-sm hidden sm:block tracking-tight hover:text-primary-cyan transition-colors" aria-label="Portfolio Command Center - Home">
               Portfolio Command Center
             </Link>
           </div>
 
           {/* Center: Search trigger */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-bg-card border border-border-subtle rounded-xl w-72 hover:border-border-default transition-colors cursor-pointer group" onClick={toggleSearch}>
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-bg-card border border-border-subtle rounded-xl w-72 hover:border-border-default transition-colors cursor-pointer group" onClick={toggleSearch} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSearch(); } }} aria-label="Open search (Ctrl+K)">
             <Search className="w-4 h-4 text-text-muted group-hover:text-text-secondary transition-colors" />
             <span className="text-sm text-text-muted group-hover:text-text-secondary transition-colors">
               Search everything...
@@ -108,11 +136,13 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
                   setSettingsOpen(false);
                 }}
                 className="relative p-2 rounded-lg hover:bg-bg-elevated transition-colors"
-                aria-label="Notifications"
+                aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+                aria-expanded={notifOpen}
+                aria-haspopup="dialog"
               >
                 <Bell className="w-5 h-5 text-text-secondary" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary-cyan rounded-full" />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary-cyan rounded-full" aria-hidden="true" />
                 )}
               </motion.button>
               <NotificationsPanel
@@ -142,6 +172,8 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
               }}
               className="p-2 rounded-lg hover:bg-bg-elevated transition-colors"
               aria-label="Settings"
+              aria-expanded={settingsOpen}
+              aria-haspopup="dialog"
             >
               <Settings className="w-5 h-5 text-text-secondary" />
             </motion.button>
@@ -152,7 +184,7 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
               whileTap={{ scale: 0.95 }}
               onClick={cycleTheme}
               className="p-2 rounded-lg hover:bg-bg-elevated transition-colors"
-              aria-label={`Current theme: ${theme}. Click to cycle.`}
+              aria-label={`Current theme: ${theme}. Click to cycle through dark, light, and system.`}
               title={`Theme: ${theme}`}
             >
               <ThemeIcon className="w-5 h-5 text-text-secondary" />

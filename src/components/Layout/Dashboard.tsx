@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import type { ReactNode } from 'react';
+import { useRef } from 'react';
 
 interface DashboardProps {
   children: ReactNode;
@@ -10,8 +11,8 @@ const container = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.15,
+      staggerChildren: 0.06,
+      delayChildren: 0.1,
     },
   },
 };
@@ -34,7 +35,7 @@ export function Dashboard({ children }: DashboardProps) {
   );
 }
 
-/* ----------------------------------------------------------------
+/* ---------------------------------------------------------------
    BENTO ITEM WRAPPER
    ---------------------------------------------------------------- */
 interface BentoItemProps {
@@ -73,16 +74,25 @@ const rowClasses: Record<number, string> = {
 };
 
 export function BentoItem({ children, className = '', span }: BentoItemProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const { scrollY } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const y = useTransform(scrollY, [0, 1], [0, 20]);
+
   const colSpan = span?.col ?? 1;
   const rowSpan = span?.row ?? 1;
 
   return (
     <motion.div
+      ref={ref}
       variants={itemVariants}
+      initial="hidden"
+      animate={isInView ? 'show' : 'hidden'}
       whileHover={{
         y: -2,
         transition: { type: 'spring' as const, stiffness: 400, damping: 25 },
       }}
+      style={{ y }}
       className={`
         ${spanClasses[colSpan]}
         ${rowClasses[rowSpan]}
@@ -95,6 +105,90 @@ export function BentoItem({ children, className = '', span }: BentoItemProps) {
         relative
         ${className}
       `}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   SCROLL-REVEAL WRAPPER FOR SECTIONS
+   ---------------------------------------------------------------- */
+interface ScrollRevealProps {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}
+
+export function ScrollReveal({ children, className = '', delay = 0 }: ScrollRevealProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   STAGGERED CHILDREN CONTAINER
+   ---------------------------------------------------------------- */
+interface StaggerContainerProps {
+  children: ReactNode;
+  className?: string;
+  stagger?: number;
+  delay?: number;
+}
+
+export function StaggerContainer({ children, className = '', stagger = 0.08, delay = 0 }: StaggerContainerProps) {
+  return (
+    <motion.div
+      className={className}
+      initial="hidden"
+      animate="show"
+      variants={{
+        hidden: { opacity: 0 },
+        show: {
+          opacity: 1,
+          transition: {
+            staggerChildren: stagger,
+            delayChildren: delay,
+          },
+        },
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   STAGGER ITEM
+   ---------------------------------------------------------------- */
+interface StaggerItemProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function StaggerItem({ children, className = '' }: StaggerItemProps) {
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 16 },
+        show: {
+          opacity: 1,
+          y: 0,
+          transition: { type: 'spring' as const, stiffness: 260, damping: 24 },
+        },
+      }}
+      className={className}
     >
       {children}
     </motion.div>

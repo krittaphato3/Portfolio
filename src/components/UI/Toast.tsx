@@ -78,6 +78,14 @@ function ToastContainer({
 }) {
   return (
     <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none">
+      {/* Live region for screen readers */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {toasts.map((toast) => (
+          <div key={toast.id} role="status">
+            {toast.message}
+          </div>
+        ))}
+      </div>
       <AnimatePresence>
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
@@ -113,6 +121,8 @@ function ToastItem({
         ${colors.bg} border ${colors.border}
         shadow-[0_8px_32px_rgba(0,0,0,0.4)]
       `}
+      role="alert"
+      aria-live="polite"
     >
       <div className="flex items-start gap-3">
         <Icon className={`w-5 h-5 ${colors.icon} flex-shrink-0 mt-0.5`} />
@@ -122,6 +132,7 @@ function ToastItem({
         <button
           onClick={() => onDismiss(toast.id)}
           className="text-zinc-500 hover:text-zinc-300 transition-colors flex-shrink-0"
+          aria-label="Dismiss notification"
         >
           <X className="w-4 h-4" />
         </button>

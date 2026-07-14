@@ -1,5 +1,5 @@
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { useEffect } from 'react';
+import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
@@ -7,7 +7,7 @@ interface StatCardProps {
   value: number;
   suffix?: string;
   icon: LucideIcon;
-  color: 'cyan' | 'violet' | 'emerald';
+  color: 'cyan' | 'violet' | 'emerald' | 'amber' | 'rose';
   description?: string;
 }
 
@@ -17,34 +17,53 @@ const colorMap = {
     bg: 'bg-primary-cyan/10',
     glow: 'shadow-[0_0_20px_rgba(6,182,212,0.2)]',
     line: 'from-primary-cyan/50 via-primary-cyan/20 to-transparent',
+    gradient: 'from-primary-cyan to-primary-cyan/50',
+    ring: 'ring-primary-cyan/30',
   },
   violet: {
     icon: 'text-primary-violet',
     bg: 'bg-primary-violet/10',
     glow: 'shadow-[0_0_20px_rgba(139,92,246,0.2)]',
     line: 'from-primary-violet/50 via-primary-violet/20 to-transparent',
+    gradient: 'from-primary-violet to-primary-violet/50',
+    ring: 'ring-primary-violet/30',
   },
   emerald: {
     icon: 'text-primary-emerald',
     bg: 'bg-primary-emerald/10',
     glow: 'shadow-[0_0_20px_rgba(16,185,129,0.2)]',
     line: 'from-primary-emerald/50 via-primary-emerald/20 to-transparent',
+    gradient: 'from-primary-emerald to-primary-emerald/50',
+    ring: 'ring-primary-emerald/30',
+  },
+  amber: {
+    icon: 'text-primary-amber',
+    bg: 'bg-primary-amber/10',
+    glow: 'shadow-[0_0_20px_rgba(245,158,11,0.2)]',
+    line: 'from-primary-amber/50 via-primary-amber/20 to-transparent',
+    gradient: 'from-primary-amber to-primary-amber/50',
+    ring: 'ring-primary-amber/30',
+  },
+  rose: {
+    icon: 'text-primary-rose',
+    bg: 'bg-primary-rose/10',
+    glow: 'shadow-[0_0_20px_rgba(244,63,94,0.2)]',
+    line: 'from-primary-rose/50 via-primary-rose/20 to-transparent',
+    gradient: 'from-primary-rose to-primary-rose/50',
+    ring: 'ring-primary-rose/30',
   },
 };
 
-function AnimatedNumber({
-  value,
-  suffix = '',
-}: {
-  value: number;
-  suffix?: string;
-}) {
+function AnimatedNumber({ value, suffix = '' }: { value: number; suffix?: string }) {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => Math.round(latest));
   const display = useTransform(rounded, (latest) => `${latest}${suffix}`);
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
 
   useEffect(() => {
-    // Respect prefers-reduced-motion for accessibility (WCAG 2.1 SC 2.3.3)
+    if (!isInView) return;
+
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
       count.set(value);
@@ -52,13 +71,48 @@ function AnimatedNumber({
     }
 
     const controls = animate(count, value, {
-      duration: 2,
+      duration: 1.8,
       ease: [0.25, 0.46, 0.45, 0.94],
     });
     return controls.stop;
-  }, [value, count]);
+  }, [value, count, isInView]);
 
-  return <motion.span>{display}</motion.span>;
+  return <motion.span ref={ref}>{display}</motion.span>;
+}
+
+function FloatingOrb({ color, delay = 0, style }: { color: 'cyan' | 'violet' | 'emerald'; delay?: number; style?: React.CSSProperties }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  useEffect(() => {
+    const controls = animate(x, [0, 15, -10, 0], {
+      duration: 8,
+      repeat: Infinity,
+      ease: 'easeInOut',
+      delay,
+    });
+    const controlsY = animate(y, [0, -10, 15, 0], {
+      duration: 10,
+      repeat: Infinity,
+      ease: 'easeInOut',
+      delay: delay + 1,
+    });
+    return () => { controls.stop(); controlsY.stop(); };
+  }, [x, y, delay]);
+
+  const colors = {
+    cyan: 'bg-primary-cyan/10',
+    violet: 'bg-primary-violet/10',
+    emerald: 'bg-primary-emerald/10',
+  };
+
+  return (
+    <motion.div
+      style={{ x, y, ...style }}
+      className={`absolute rounded-full blur-2xl pointer-events-none ${colors[color]} transition-opacity`}
+      aria-hidden="true"
+    />
+  );
 }
 
 export function StatCard({
@@ -70,14 +124,32 @@ export function StatCard({
   description,
 }: StatCardProps) {
   const colors = colorMap[color];
+  const cardRef = useRef<HTMLDivElement>(null);
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
+      ref={cardRef}
+      whileHover={{ scale: 1.02, y: -4 }}
       transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
-      className="relative p-6 bg-gradient-to-br from-bg-elevated to-bg-card rounded-2xl border border-border-subtle hover:border-border-default transition-all duration-300 group"
+      className="relative p-6 bg-gradient-to-br from-bg-elevated to-bg-card rounded-2xl border border-border-subtle hover:border-border-default transition-all duration-500 group overflow-hidden"
     >
-      <div className="flex items-start justify-between">
+      {/* Animated background orbs */}
+      <FloatingOrb color={color as 'cyan' | 'violet' | 'emerald'} delay={0} style={{ width: '80px', height: '80px', top: '-40px', right: '-40px' }} />
+      <FloatingOrb color={color as 'cyan' | 'violet' | 'emerald'} delay={2} style={{ width: '60px', height: '60px', bottom: '-30px', left: '-30px' }} />
+
+      {/* Subtle grid pattern */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none" aria-hidden="true">
+        <svg width="100%" height="100%">
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.5" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
+
+      <div className="relative z-10 flex items-start justify-between">
         <div>
           <p className="text-sm text-text-secondary font-medium">{title}</p>
           <div className="mt-3 flex items-baseline gap-1">
@@ -98,9 +170,19 @@ export function StatCard({
         </motion.div>
       </div>
 
-      {/* Decorative gradient line at bottom */}
+      {/* Animated gradient line at bottom */}
+      <motion.div
+        initial={{ scaleX: 0, opacity: 0 }}
+        animate={{ scaleX: 1, opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className={`absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r ${colors.line} origin-left`}
+        style={{ transformOrigin: 'left center' }}
+      />
+
+      {/* Shimmer effect on hover */}
       <div
-        className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${colors.line} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+        className={`absolute inset-0 bg-gradient-to-r ${colors.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none`}
+        aria-hidden="true"
       />
     </motion.div>
   );

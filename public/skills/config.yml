@@ -14,6 +14,10 @@ categories:
         level: 78
       - name: Framer Motion
         level: 85
+      - name: HTML5 / CSS3
+        level: 95
+      - name: JavaScript (ES6+)
+        level: 95
 
   - name: Backend
     icon: "database"
@@ -21,13 +25,71 @@ categories:
       - name: Node.js
         level: 88
       - name: Python
+        level: 85
+      - name: Java
         level: 82
+      - name: C#
+        level: 80
       - name: PostgreSQL
         level: 80
       - name: GraphQL
         level: 75
       - name: Redis
         level: 70
+      - name: REST APIs
+        level: 90
+      - name: Microservices
+        level: 75
+
+  - name: Systems & Low-Level
+    icon: "database"
+    skills:
+      - name: C
+        level: 75
+      - name: C++
+        level: 72
+      - name: Rust
+        level: 65
+      - name: Go
+        level: 70
+      - name: Assembly (x86/x64)
+        level: 55
+
+  - name: Cyber Security
+    icon: "code"
+    skills:
+      - name: Penetration Testing
+        level: 70
+      - name: Network Security
+        level: 75
+      - name: Web Application Security
+        level: 80
+      - name: Cryptography
+        level: 65
+      - name: SIEM / SOC Operations
+        level: 60
+      - name: Vulnerability Assessment
+        level: 72
+      - name: CTF / Red Teaming
+        level: 68
+
+  - name: AI / Machine Learning
+    icon: "code"
+    skills:
+      - name: PyTorch
+        level: 72
+      - name: TensorFlow
+        level: 68
+      - name: Scikit-learn
+        level: 75
+      - name: Pandas / NumPy
+        level: 82
+      - name: LLMs / Transformers
+        level: 70
+      - name: Computer Vision
+        level: 65
+      - name: MLOps
+        level: 60
 
   - name: Design
     icon: "palette"
@@ -36,8 +98,12 @@ categories:
         level: 85
       - name: Framer
         level: 80
+      - name: UI/UX Design
+        level: 82
+      - name: Design Systems
+        level: 78
 
-  - name: Tools
+  - name: Tools & DevOps
     icon: "wrench"
     skills:
       - name: Git
@@ -46,5 +112,11 @@ categories:
         level: 78
       - name: AWS
         level: 74
-      - name: CI/CD
+      - name: CI/CD (GitHub Actions, GitLab)
         level: 80
+      - name: Kubernetes
+        level: 65
+      - name: Linux / Bash
+        level: 85
+      - name: VS Code / JetBrains IDEs
+        level: 95

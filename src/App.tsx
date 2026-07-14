@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -19,10 +19,14 @@ import { loadSkillsFromYaml } from './lib/skills';
 import {
   fetchRepoCount,
   fetchPinnedRepos,
+  fetchGitHubUser,
   type PinnedRepo,
+  type GitHubUserProfile,
 } from './lib/github';
 import { defaultSettings, type SettingsState } from './components/UI/SettingsPanel';
-import { CertificatesPage } from './pages/CertificatesPage';
+
+// Lazy load heavy pages
+const CertificatesPage = lazy(() => import('./pages/CertificatesPage').then(m => ({ default: m.CertificatesPage })));
 
 /* ============================================================
    APP COMPONENT
@@ -34,6 +38,7 @@ function App() {
   const [repoCount, setRepoCount] = useState(0);
   const [pinnedRepos, setPinnedRepos] = useState<PinnedRepo[]>([]);
   const [pinnedUpdates, setPinnedUpdates] = useState<ActivityItem[]>([]);
+  const [githubProfile, setGithubProfile] = useState<GitHubUserProfile | null>(null);
 
   // Certificate data
   const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -92,12 +97,14 @@ function App() {
   useEffect(() => {
     async function loadGitHub() {
       try {
-        const [count, pinned] = await Promise.all([
+        const [count, pinned, profile] = await Promise.all([
           fetchRepoCount(),
           fetchPinnedRepos(),
+          fetchGitHubUser(),
         ]);
         setRepoCount(count);
         setPinnedRepos(pinned);
+        setGithubProfile(profile);
 
         // Build recent updates from pinned repos using pushed_at when available
         const updates: ActivityItem[] = pinned.slice(0, 4).map((repo) => ({
@@ -109,7 +116,7 @@ function App() {
           url: repo.url,
         }));
         setPinnedUpdates(updates);
-      } catch (err) {
+      } catch {
         showToast(
           'Could not load GitHub data. Check your connection or token.',
           'error'
@@ -119,7 +126,7 @@ function App() {
       }
     }
     loadGitHub();
-  }, []);
+  }, [showToast]);
 
   // Fetch certificates from file-based CMS
   useEffect(() => {
@@ -147,7 +154,7 @@ function App() {
           .slice(0, 2);
 
         setCertUpdates(updates);
-      } catch (err) {
+      } catch {
         showToast(
           'Could not load certificates. Check the config files in public/certs/.',
           'error'
@@ -157,7 +164,7 @@ function App() {
       }
     }
     loadCerts();
-  }, []);
+  }, [showToast]);
 
   // Fetch skills from YAML config
   useEffect(() => {
@@ -181,7 +188,7 @@ function App() {
       <div className="min-h-screen bg-bg-dark flex flex-col">
         <Header settings={settings} onSettingsChange={setSettings} />
 
-        <main className="flex-1">
+        <main id="main-content" className="flex-1">
           <Routes>
             <Route
               path="/"
@@ -190,7 +197,7 @@ function App() {
                   <Dashboard>
                     {/* Row 1: Profile + 3 Stats */}
                     <BentoItem span={{ col: 1, row: 2 }}>
-                      <ProfileWidget />
+                      <ProfileWidget githubProfile={githubProfile} />
                     </BentoItem>
 
                     <BentoItem span={{ col: 1, row: 1 }}>
@@ -267,7 +274,23 @@ function App() {
                 </div>
               }
             />
-            <Route path="/certificates" element={<CertificatesPage />} />
+            <Route
+              path="/certificates"
+              element={
+                <Suspense
+                  fallback={
+                    <div className="min-h-screen bg-bg-dark flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-12 h-12 border-3 border-primary-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                        <p className="text-text-secondary">Loading certificates...</p>
+                      </div>
+                    </div>
+                  }
+                >
+                  <CertificatesPage />
+                </Suspense>
+              }
+            />
           </Routes>
         </main>
 

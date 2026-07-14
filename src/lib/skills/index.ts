@@ -22,6 +22,9 @@ const skillModules = import.meta.glob('/public/skills/config.yml', {
 const iconToCategory: Record<string, Skill['category']> = {
   code: 'frontend',
   database: 'backend',
+  cpu: 'systems',
+  shield: 'security',
+  brain: 'ai',
   palette: 'design',
   wrench: 'tools',
 };
