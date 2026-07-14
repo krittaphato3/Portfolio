@@ -236,7 +236,7 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
     </div>
   ) : (
     <>
-      <div className={`flex flex-col flex-auto ${expanded ? 'max-h-[600px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}>
+      <div className={`${expanded ? 'max-h-[600px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}>
         <div className="space-y-4">
           {visibleCategories.map((category, index) => (
             <CategorySection
@@ -251,7 +251,7 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
       </div>
 
       {hasMore && (
-        <div className="flex justify-center mt-auto pt-4 border-t border-border-subtle/50">
+        <div className="flex justify-center pt-4 border-t border-border-subtle/50">
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -276,7 +276,7 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
   );
 
   return (
-    <div className="p-6 flex flex-col h-full">
+    <div className="h-full p-6 grid grid-rows-[1fr_auto]">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-primary-violet/10 rounded-xl">
           <Code2 className="w-5 h-5 text-primary-violet" />
