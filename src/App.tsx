@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { Routes, Route } from 'react-router';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Dashboard, BentoItem } from './components/Layout/Dashboard';
@@ -18,10 +19,10 @@ import { loadSkillsFromYaml } from './lib/skills';
 import {
   fetchRepoCount,
   fetchPinnedRepos,
-  fetchGitHubEvents,
   type PinnedRepo,
 } from './lib/github';
 import { defaultSettings, type SettingsState } from './components/UI/SettingsPanel';
+import { CertificatesPage } from './pages/CertificatesPage';
 
 /* ============================================================
    APP COMPONENT
@@ -38,9 +39,6 @@ function App() {
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [certCount, setCertCount] = useState(0);
   const [certUpdates, setCertUpdates] = useState<ActivityItem[]>([]);
-
-  // GitHub events
-  const [githubEvents, setGithubEvents] = useState<ActivityItem[]>([]);
 
   // Skills from YAML
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -84,24 +82,22 @@ function App() {
   // Derived: merge cert + pinned + github events, sorted by timestamp descending
   const recentUpdates = useMemo(
     () =>
-      [...certUpdates, ...pinnedUpdates, ...githubEvents]
+      [...certUpdates, ...pinnedUpdates]
         .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
         .slice(0, 5),
-    [certUpdates, pinnedUpdates, githubEvents]
+    [certUpdates, pinnedUpdates]
   );
 
   // Fetch GitHub data
   useEffect(() => {
     async function loadGitHub() {
       try {
-        const [count, pinned, events] = await Promise.all([
+        const [count, pinned] = await Promise.all([
           fetchRepoCount(),
           fetchPinnedRepos(),
-          fetchGitHubEvents(),
         ]);
         setRepoCount(count);
         setPinnedRepos(pinned);
-        setGithubEvents(events);
 
         // Build recent updates from pinned repos using pushed_at when available
         const updates: ActivityItem[] = pinned.slice(0, 4).map((repo) => ({
@@ -186,75 +182,93 @@ function App() {
         <Header settings={settings} onSettingsChange={setSettings} />
 
         <main className="flex-1">
-          <Dashboard>
-            {/* Row 1: Profile + 3 Stats */}
-            <BentoItem span={{ col: 1, row: 2 }}>
-              <ProfileWidget />
-            </BentoItem>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div id="dashboard">
+                  <Dashboard>
+                    {/* Row 1: Profile + 3 Stats */}
+                    <BentoItem span={{ col: 1, row: 2 }}>
+                      <ProfileWidget />
+                    </BentoItem>
 
-            <BentoItem span={{ col: 1, row: 1 }}>
-              <StatCard
-                title="Total Projects"
-                value={repoCount}
-                icon={Folder}
-                color="cyan"
-                description="Public repositories"
-              />
-            </BentoItem>
+                    <BentoItem span={{ col: 1, row: 1 }}>
+                      <StatCard
+                        title="Total Projects"
+                        value={repoCount}
+                        icon={Folder}
+                        color="cyan"
+                        description="Public repositories"
+                      />
+                    </BentoItem>
 
-            <BentoItem span={{ col: 1, row: 1 }}>
-              <StatCard
-                title="Certifications"
-                value={certCount}
-                icon={Award}
-                color="violet"
-                description="Professional credentials"
-              />
-            </BentoItem>
+                    <BentoItem span={{ col: 1, row: 1 }}>
+                      <StatCard
+                        title="Certifications"
+                        value={certCount}
+                        icon={Award}
+                        color="violet"
+                        description="Professional credentials"
+                      />
+                    </BentoItem>
 
-            <BentoItem span={{ col: 1, row: 1 }}>
-              <StatCard
-                title="Languages"
-                value={languagesCount || 17}
-                icon={Code2}
-                color="emerald"
-                description="Technologies used"
-              />
-            </BentoItem>
+                    <BentoItem span={{ col: 1, row: 1 }}>
+                      <StatCard
+                        title="Languages"
+                        value={languagesCount || 17}
+                        icon={Code2}
+                        color="emerald"
+                        description="Technologies used"
+                      />
+                    </BentoItem>
 
-            {/* Row 2: Feature Work (spans 2 cols) + Recent Updates (spans 2 cols) */}
-            <BentoItem span={{ col: 2, row: 1 }}>
-              <ProjectsWidget repos={pinnedRepos} loading={loading.github} />
-            </BentoItem>
+                    {/* Row 2: Feature Work (spans 2 cols) + Recent Updates (spans 2 cols) */}
+                    <BentoItem span={{ col: 2, row: 1 }}>
+                      <div id="feature-work">
+                        <ProjectsWidget repos={pinnedRepos} loading={loading.github} />
+                      </div>
+                    </BentoItem>
 
-            <BentoItem span={{ col: 2, row: 1 }}>
-              <ActivityFeed activities={recentUpdates} loading={loading.github || loading.certs} />
-            </BentoItem>
+                    <BentoItem span={{ col: 2, row: 1 }}>
+                      <div id="recent-updates">
+                        <ActivityFeed activities={recentUpdates} loading={loading.github || loading.certs} />
+                      </div>
+                    </BentoItem>
 
-            {/* Row 3: Skills (spans 2 cols) + Tech Proficiency (spans 1) + Deploy (spans 1) */}
-            <BentoItem span={{ col: 2, row: 1 }}>
-              <SkillsWidget skills={skills} />
-            </BentoItem>
+                    {/* Row 3: Skills (spans 2 cols) + Tech Proficiency (spans 1) + Deploy (spans 1) */}
+                    <BentoItem span={{ col: 2, row: 1 }}>
+                      <div id="skills">
+                        <SkillsWidget skills={skills} />
+                      </div>
+                    </BentoItem>
 
-            <BentoItem span={{ col: 1, row: 1 }}>
-              <SystemStatusWidget />
-            </BentoItem>
+                    <BentoItem span={{ col: 1, row: 1 }}>
+                      <SystemStatusWidget />
+                    </BentoItem>
 
-            <BentoItem span={{ col: 1, row: 1 }}>
-              <StatCard
-                title="Years Coding"
-                value={yearsCoding}
-                icon={Rocket}
-                color="cyan"
-                description="Building projects"
-              />
-            </BentoItem>
+                    <BentoItem span={{ col: 1, row: 1 }}>
+                      <StatCard
+                        title="Years Coding"
+                        value={yearsCoding}
+                        icon={Rocket}
+                        color="cyan"
+                        description="Building projects"
+                      />
+                    </BentoItem>
 
-            {/* Row 4: Certifications full width */}
-            <BentoItem span={{ col: 4, row: 1 }}>
-              <CertPanel categories={categories} loading={loading.certs} />
-            </BentoItem>
-          </Dashboard>
+                    {/* Row 4: Certifications compact */}
+                    <BentoItem span={{ col: 4, row: 1 }}>
+                      <div id="certifications">
+                        <CertPanel categories={categories} loading={loading.certs} compact />
+                      </div>
+                    </BentoItem>
+                  </Dashboard>
+                </div>
+              }
+            />
+            <Route path="/certificates" element={<CertificatesPage />} />
+          </Routes>
         </main>
 
         <Footer />

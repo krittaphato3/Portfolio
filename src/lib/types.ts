@@ -17,7 +17,7 @@ export interface Skill {
 
 export interface ActivityItem {
   id: string;
-  type: 'project' | 'update' | 'cert' | 'feature' | 'commit' | 'action';
+  type: 'project' | 'update' | 'cert' | 'feature';
   title: string;
   description: string;
   timestamp: Date;

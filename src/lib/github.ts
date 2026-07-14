@@ -228,10 +228,10 @@ export async function fetchGitHubEvents(): Promise<ActivityItem[]> {
       .slice(0, 5)
       .map((e: any): ActivityItem => {
         const typeMap: Record<string, ActivityItem['type']> = {
-          PushEvent: 'commit',
+          PushEvent: 'update',
           CreateEvent: 'project',
-          DeploymentStatusEvent: 'action',
-          ReleaseEvent: 'action',
+          DeploymentStatusEvent: 'update',
+          ReleaseEvent: 'update',
         };
         return {
           id: e.id,

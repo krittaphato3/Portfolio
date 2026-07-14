@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Activity, Award, Pin, Folder, Sparkles, Plus, MapPin, ExternalLink, GitCommitHorizontal, Zap } from 'lucide-react';
+import { Activity, Award, Pin, Folder, Sparkles, Plus, MapPin, ExternalLink } from 'lucide-react';
 import type { ActivityItem } from '../../lib/types';
 import { useSettings } from '../../hooks/useSettings';
 
@@ -38,20 +38,6 @@ const typeConfig = {
     bg: 'bg-primary-emerald/10',
     dot: 'bg-primary-emerald',
     label: 'Update',
-  },
-  commit: {
-    icon: GitCommitHorizontal,
-    color: 'text-primary-cyan',
-    bg: 'bg-primary-cyan/10',
-    dot: 'bg-primary-cyan',
-    label: 'Commit',
-  },
-  action: {
-    icon: Zap,
-    color: 'text-primary-amber',
-    bg: 'bg-primary-amber/10',
-    dot: 'bg-primary-amber',
-    label: 'Action',
   },
 } as const;
 
@@ -95,7 +81,7 @@ export function ActivityFeed({
 
   const filteredActivities = activities.filter((activity) => {
     if (activity.type === 'cert' && !settings.notifications.certAlerts) return false;
-    if ((activity.type === 'project' || activity.type === 'feature' || activity.type === 'commit' || activity.type === 'action') && !settings.notifications.projectUpdates) return false;
+    if ((activity.type === 'project' || activity.type === 'feature') && !settings.notifications.projectUpdates) return false;
     return true;
   });
 

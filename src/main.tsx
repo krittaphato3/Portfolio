@@ -1,5 +1,6 @@
 import React, { Component, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
 import './index.css';
 import App from './App.tsx';
 import { ToastProvider } from './components/UI/Toast';
@@ -54,11 +55,13 @@ class ErrorBoundary extends Component<
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <ThemeProvider>
-        <ToastProvider>
-          <App />
-        </ToastProvider>
-      </ThemeProvider>
+      <BrowserRouter>
+        <ThemeProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </ThemeProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   </React.StrictMode>,
 );

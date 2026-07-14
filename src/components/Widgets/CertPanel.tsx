@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Award,
@@ -25,6 +26,7 @@ interface CertPanelProps {
   categories: CategoryData[];
   loading: boolean;
   limit?: number;
+  compact?: boolean;
 }
 
 type GridSize = 'small' | 'medium' | 'large';
@@ -282,12 +284,15 @@ export function CertPanel({
   categories,
   loading,
   limit = 6,
+  compact = false,
 }: CertPanelProps) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [expanded, setExpanded] = useState(false);
   const [gridSize, setGridSize] = useState<GridSize>('medium');
   const [viewerCert, setViewerCert] = useState<Certificate | null>(null);
   const { settings } = useSettings();
+
+  const isCompactView = compact;
 
   const allCerts = useMemo(
     () => categories.flatMap(cat => cat.certificates),
@@ -300,12 +305,12 @@ export function CertPanel({
   }, [allCerts, activeCategory]);
 
   const visibleCerts = useMemo(
-    () => (expanded ? filteredCerts : filteredCerts.slice(0, limit)),
-    [filteredCerts, expanded, limit]
+    () => (expanded || isCompactView ? filteredCerts : filteredCerts.slice(0, limit)),
+    [filteredCerts, expanded, isCompactView, limit]
   );
 
-  const hasMore = filteredCerts.length > limit;
-  const compact = settings.display.compactMode || gridSize === 'small';
+  const hasMore = !isCompactView && filteredCerts.length > limit;
+  const cardCompact = isCompactView || settings.display.compactMode || gridSize === 'small';
 
   const handleOpen = (cert: Certificate) => {
     setViewerCert(cert);
@@ -332,29 +337,31 @@ export function CertPanel({
         </div>
 
         {/* Grid Size Selector */}
-        <div className="flex items-center gap-1 bg-bg-elevated rounded-lg border border-border-subtle p-0.5">
-          {(Object.keys(GRID_CONFIG) as GridSize[]).map(size => {
-            const config = GRID_CONFIG[size];
-            const Icon = config.icon;
-            return (
-              <motion.button
-                key={size}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setGridSize(size)}
-                className={`p-1.5 rounded-md transition-colors ${
-                  gridSize === size
-                    ? 'bg-bg-card text-primary-cyan border border-border-subtle'
-                    : 'text-text-muted hover:text-text-secondary'
-                }`}
-                aria-label={`${config.label} view`}
-                aria-pressed={gridSize === size}
-                title={`${config.label} view`}
-              >
-                <Icon className="w-4 h-4" />
-              </motion.button>
-            );
-          })}
-        </div>
+        {!isCompactView && (
+          <div className="flex items-center gap-1 bg-bg-elevated rounded-lg border border-border-subtle p-0.5">
+            {(Object.keys(GRID_CONFIG) as GridSize[]).map(size => {
+              const config = GRID_CONFIG[size];
+              const Icon = config.icon;
+              return (
+                <motion.button
+                  key={size}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setGridSize(size)}
+                  className={`p-1.5 rounded-md transition-colors ${
+                    gridSize === size
+                      ? 'bg-bg-card text-primary-cyan border border-border-subtle'
+                      : 'text-text-muted hover:text-text-secondary'
+                  }`}
+                  aria-label={`${config.label} view`}
+                  aria-pressed={gridSize === size}
+                  title={`${config.label} view`}
+                >
+                  <Icon className="w-4 h-4" />
+                </motion.button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Category Tabs */}
@@ -433,8 +440,8 @@ export function CertPanel({
             exit={{ opacity: 0 }}
             className={`grid gap-3 ${GRID_CONFIG[gridSize].cols}`}
           >
-            {Array.from({ length: compact ? 8 : 6 }).map((_, i) => (
-              <CertSkeleton key={i} compact={compact} />
+            {Array.from({ length: cardCompact ? 8 : 6 }).map((_, i) => (
+              <CertSkeleton key={i} compact={cardCompact} />
             ))}
           </motion.div>
         ) : visibleCerts.length === 0 ? (
@@ -470,7 +477,7 @@ export function CertPanel({
               <CertCard
                 key={cert.id}
                 cert={cert}
-                compact={compact}
+                compact={cardCompact}
                 index={index}
                 onOpen={() => handleOpen(cert)}
               />
@@ -480,7 +487,7 @@ export function CertPanel({
       </AnimatePresence>
 
       {/* View All / Show Less */}
-      {!loading && hasMore && filteredCerts.length > 0 && (
+      {!loading && !isCompactView && hasMore && filteredCerts.length > 0 && (
         <div className="flex justify-center mt-5">
           <motion.button
             whileHover={{ scale: 1.03 }}
@@ -504,6 +511,17 @@ export function CertPanel({
               </>
             )}
           </motion.button>
+        </div>
+      )}
+      {!loading && isCompactView && filteredCerts.length > 0 && (
+        <div className="flex justify-center mt-5">
+          <Link
+            to="/certificates"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-primary-cyan bg-primary-cyan/10 border border-primary-cyan/30 rounded-xl hover:bg-primary-cyan/15 transition-colors"
+          >
+            View All Certificates ({filteredCerts.length})
+            <ChevronDown className="w-3.5 h-3.5" />
+          </Link>
         </div>
       )}
 

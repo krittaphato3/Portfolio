@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import {
   Command,
@@ -79,9 +80,9 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
             >
               <Command className="w-4 h-4 text-white" />
             </motion.div>
-            <span className="text-text-primary font-semibold text-sm hidden sm:block tracking-tight">
+            <Link to="/" className="text-text-primary font-semibold text-sm hidden sm:block tracking-tight hover:text-primary-cyan transition-colors">
               Portfolio Command Center
-            </span>
+            </Link>
           </div>
 
           {/* Center: Search trigger */}

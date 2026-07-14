@@ -30,6 +30,7 @@ interface SearchModalProps {
   onClose: () => void;
   /** External items to search through. Falls back to built-in items when empty. */
   items?: SearchItem[];
+  onOpenSettings?: () => void;
 }
 
 /* ----------------------------------------------------------------
@@ -57,7 +58,7 @@ const defaultItems: SearchItem[] = [
     title: 'Projects',
     description: 'GitHub pinned repositories',
     category: 'project',
-    url: '#projects',
+    url: '#feature-work',
     icon: <Folder className="w-4 h-4" />,
   },
   {
@@ -151,7 +152,7 @@ const resultItemVariants = {
 /* ----------------------------------------------------------------
    COMPONENT
    ---------------------------------------------------------------- */
-export function SearchModal({ open, onClose, items }: SearchModalProps) {
+export function SearchModal({ open, onClose, items, onOpenSettings }: SearchModalProps) {
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -218,13 +219,17 @@ export function SearchModal({ open, onClose, items }: SearchModalProps) {
           break;
         case 'Enter':
           e.preventDefault();
-          if (results[activeIndex]?.url) {
-            const url = results[activeIndex].url!;
-            if (url.startsWith('#')) {
-              const el = document.querySelector(url);
-              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-              window.open(url, '_blank', 'noopener,noreferrer');
+          if (results[activeIndex]) {
+            const item = results[activeIndex];
+            if (item.category === 'setting' && onOpenSettings) {
+              onOpenSettings();
+            } else if (item.url) {
+              if (item.url.startsWith('#')) {
+                const el = document.querySelector(item.url);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              } else {
+                window.open(item.url, '_blank', 'noopener,noreferrer');
+              }
             }
             onClose();
           }
@@ -315,7 +320,9 @@ export function SearchModal({ open, onClose, items }: SearchModalProps) {
                         aria-selected={isActive}
                         onMouseEnter={() => setActiveIndex(index)}
                         onClick={() => {
-                          if (item.url) {
+                          if (item.category === 'setting' && onOpenSettings) {
+                            onOpenSettings();
+                          } else if (item.url) {
                             if (item.url.startsWith('#')) {
                               const el = document.querySelector(item.url);
                               if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
