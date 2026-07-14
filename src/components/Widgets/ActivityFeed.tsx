@@ -198,7 +198,7 @@ export function ActivityFeed({
   const showPinSuggestion = !loading && activities.length === 0;
 
   return (
-    <div className="h-full p-6 grid grid-rows-[1fr_auto] items-start">
+    <div className="h-full p-6 flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary-emerald/10 rounded-xl">
@@ -253,7 +253,7 @@ export function ActivityFeed({
       ) : (
         <>
           <div
-            className={`relative ${expanded ? 'max-h-[420px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}
+            className={`relative flex-1 min-h-0 ${expanded ? 'max-h-[420px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}
           >
             {visibleActivities.map((activity, index) => (
               <ActivityItemComponent
@@ -269,7 +269,7 @@ export function ActivityFeed({
           </div>
 
           {hasMore && (
-            <div className="flex justify-center pt-4 border-t border-border-subtle/50">
+            <div className="flex justify-center mt-auto pt-4 border-t border-border-subtle/50">
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
