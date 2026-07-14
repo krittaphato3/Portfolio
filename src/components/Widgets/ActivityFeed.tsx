@@ -253,7 +253,7 @@ export function ActivityFeed({
       ) : (
         <>
           <div
-            className={`relative flex-1 min-h-0 ${expanded ? 'max-h-[420px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}
+            className="relative flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin"
           >
             {visibleActivities.map((activity, index) => (
               <ActivityItemComponent

@@ -236,7 +236,7 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
     </div>
   ) : (
     <>
-      <div className={`flex-1 min-h-0 ${expanded ? 'max-h-[600px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}>
+      <div className="flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin">
         <div className="space-y-4">
           {visibleCategories.map((category, index) => (
             <CategorySection
