@@ -151,7 +151,7 @@ function ActivityItemContent({ activity, config, Icon, isFirst, isLast, onCertCl
           {activity.type === 'cert' && activity.certificateId && onCertClick && (
             <button
               onClick={() => onCertClick(activity.certificateId!)}
-              className="text-[11px] text-text-dim hover:text-primary-cyan transition-colors inline-flex items-center gap-0.5 cursor-pointer"
+              className="text-[10px] text-text-dim/70 hover:text-primary-cyan transition-colors inline-flex items-center gap-0.5 cursor-pointer"
             >
               <ExternalLink className="w-3 h-3" />
               View
@@ -162,7 +162,7 @@ function ActivityItemContent({ activity, config, Icon, isFirst, isLast, onCertCl
               href={activity.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[11px] text-text-dim hover:text-primary-cyan transition-colors inline-flex items-center gap-0.5"
+              className="text-[10px] text-text-dim/70 hover:text-primary-cyan transition-colors inline-flex items-center gap-0.5"
             >
               <ExternalLink className="w-3 h-3" />
               View
@@ -191,7 +191,7 @@ export function ActivityFeed({
     return true;
   });
 
-  const COLLAPSED_LIMIT = 4;
+  const COLLAPSED_LIMIT = 6;
   const hasMore = filteredActivities.length > COLLAPSED_LIMIT;
   const visibleActivities = expanded ? filteredActivities : filteredActivities.slice(0, COLLAPSED_LIMIT);
 
@@ -253,7 +253,7 @@ export function ActivityFeed({
       ) : (
         <>
           <div
-            className={`relative ${expanded ? 'max-h-[600px] overflow-y-auto pr-1 scrollbar-none' : ''}`}
+            className={`relative ${expanded ? 'max-h-[420px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}
           >
             {visibleActivities.map((activity, index) => (
               <ActivityItemComponent
@@ -269,7 +269,7 @@ export function ActivityFeed({
           </div>
 
           {hasMore && (
-            <div className="flex justify-center mt-4 pt-3 border-t border-border-subtle">
+            <div className="flex justify-center mt-4 pt-4 border-t border-border-subtle/50">
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}

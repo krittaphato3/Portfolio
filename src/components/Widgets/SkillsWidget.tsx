@@ -114,7 +114,7 @@ function SkillChip({ skill, styles, index, animationsEnabled }: SkillChipProps) 
       <div
         ref={ref}
         className={`
-          px-3 py-1.5 rounded-lg text-xs font-medium cursor-default
+          px-2.5 py-1 rounded-lg text-xs font-medium cursor-default
           ${styles.chipBg} ${styles.chipText}
           border ${styles.chipBorder}
           ${styles.chipHover} transition-colors duration-200
@@ -134,7 +134,7 @@ function SkillChip({ skill, styles, index, animationsEnabled }: SkillChipProps) 
       transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 25 }}
       whileHover={{ scale: 1.05, y: -2, boxShadow: styles.glow, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
       className={`
-        px-3 py-1.5 rounded-lg text-xs font-medium cursor-default
+        px-2.5 py-1 rounded-lg text-xs font-medium cursor-default
         ${styles.chipBg} ${styles.chipText}
         border ${styles.chipBorder}
         ${styles.chipHover} transition-all duration-200
@@ -172,11 +172,11 @@ function CategorySection({ category, skills, index, animationsEnabled }: Categor
       className="space-y-2.5"
     >
       <div className="flex items-center gap-2">
-        <div className={`p-2 rounded-xl ${styles.chipBg} ${styles.glow}`}>
+        <div className={`p-1.5 rounded-lg ${styles.chipBg} ${styles.glow}`}>
           <Icon className={`w-4 h-4 ${styles.iconColor}`} />
         </div>
-        <span className="text-xs text-text-secondary capitalize font-medium">{label}</span>
-        <span className="text-xs text-text-dim font-normal">
+        <span className="text-[11px] text-text-secondary capitalize font-medium">{label}</span>
+        <span className="text-[11px] text-text-dim font-normal">
           ({skills.length} skills)
         </span>
       </div>
@@ -228,7 +228,7 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
       <p className="text-sm text-text-muted">No skills loaded yet.</p>
     </div>
   ) : (
-    <div className="space-y-6">
+    <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
       {categoryOrder
         .filter((cat) => grouped[cat] && grouped[cat].length > 0)
         .map((category, index) => (
