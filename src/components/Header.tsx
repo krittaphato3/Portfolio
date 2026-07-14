@@ -21,7 +21,9 @@ interface HeaderProps {
 
 export function Header({ settings, onSettingsChange }: HeaderProps) {
   const { theme, setTheme } = useThemeContext();
-  const [notifications, setNotifications] = useState(useSampleNotifications);
+  const defaultNotifications = useSampleNotifications();
+  const [notifications, setNotifications] = useState(defaultNotifications);
+
 
   // Panel state
   const [searchOpen, setSearchOpen] = useState(false);
