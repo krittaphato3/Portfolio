@@ -277,7 +277,7 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
 
   return (
     <div className="h-full p-6 grid grid-rows-[1fr_auto] items-start">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-3">
         <div className="p-2 bg-primary-violet/10 rounded-xl">
           <Code2 className="w-5 h-5 text-primary-violet" />
         </div>

@@ -199,7 +199,7 @@ export function ActivityFeed({
 
   return (
     <div className="h-full p-6 grid grid-rows-[1fr_auto] items-start">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary-emerald/10 rounded-xl">
             <Activity className="w-5 h-5 text-primary-emerald" />
