@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion';
-import { Code2, Database, Cpu, Shield, Brain, Palette, Wrench } from 'lucide-react';
-import { useRef } from 'react';
+import { Code2, Database, Cpu, Shield, Brain, Palette, Wrench, ChevronDown, ChevronUp } from 'lucide-react';
+import { useRef, useState } from 'react';
 import type { Skill } from '../../lib/types';
 import { useSettings } from '../../hooks/useSettings';
 
@@ -198,6 +198,7 @@ function CategorySection({ category, skills, index, animationsEnabled }: Categor
 export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
   const { settings } = useSettings();
   const animationsEnabled = settings.display.animations;
+  const [expanded, setExpanded] = useState(false);
 
   // Group skills by category
   const grouped = skills.reduce(
@@ -208,6 +209,12 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
     },
     {} as Record<string, Skill[]>
   );
+
+  const activeCategories = categoryOrder.filter((cat) => grouped[cat] && grouped[cat].length > 0);
+  const COLLAPSED_LIMIT = 3;
+  const hasMore = activeCategories.length > COLLAPSED_LIMIT;
+  const visibleCategories = expanded ? activeCategories : activeCategories.slice(0, COLLAPSED_LIMIT);
+  const totalSkills = skills.length;
 
   const content = loading ? (
     <div className="space-y-4">
@@ -228,10 +235,9 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
       <p className="text-sm text-text-muted">No skills loaded yet.</p>
     </div>
   ) : (
-    <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
-      {categoryOrder
-        .filter((cat) => grouped[cat] && grouped[cat].length > 0)
-        .map((category, index) => (
+    <>
+      <div className={`space-y-4 ${expanded ? 'max-h-[600px] overflow-y-auto pr-1 scrollbar-thin' : ''}`}>
+        {visibleCategories.map((category, index) => (
           <CategorySection
             key={category}
             category={category}
@@ -240,7 +246,31 @@ export function SkillsWidget({ skills, loading = false }: SkillsWidgetProps) {
             animationsEnabled={animationsEnabled}
           />
         ))}
-    </div>
+      </div>
+
+      {hasMore && (
+        <div className="flex justify-center mt-4 pt-4 border-t border-border-subtle/50">
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-primary-violet bg-primary-violet/10 border border-primary-violet/20 rounded-xl hover:bg-primary-violet/15 transition-colors"
+          >
+            {expanded ? (
+              <>
+                Show Less
+                <ChevronUp className="w-3.5 h-3.5" />
+              </>
+            ) : (
+              <>
+                All Skills ({totalSkills})
+                <ChevronDown className="w-3.5 h-3.5" />
+              </>
+            )}
+          </motion.button>
+        </div>
+      )}
+    </>
   );
 
   return (
