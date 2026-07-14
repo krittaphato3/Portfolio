@@ -271,7 +271,7 @@ function App() {
                     </BentoItem>
 
                     <BentoItem span={{ col: 2, row: 1 }}>
-                      <div id="recent-updates" className="h-full">
+                      <div id="recent-updates" className="h-[500px]">
                         <ActivityFeed
                           activities={recentUpdates}
                           loading={loading.github || loading.certs}
@@ -282,7 +282,7 @@ function App() {
 
                     {/* Row 3: Skills (spans 2 cols) + Tech Proficiency (spans 1) + Deploy (spans 1) */}
                     <BentoItem span={{ col: 2, row: 1 }}>
-                      <div id="skills" className="h-full">
+                      <div id="skills" className="h-[500px]">
                         <SkillsWidget skills={skills} />
                       </div>
                     </BentoItem>
