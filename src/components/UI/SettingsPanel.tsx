@@ -9,6 +9,7 @@ import {
   BellOff,
   Minimize2,
   Sparkles,
+  Cloud,
   Palette,
   Layout,
 } from 'lucide-react';
@@ -28,6 +29,7 @@ export interface SettingsState {
   display: {
     compactMode: boolean;
     animations: boolean;
+    ambientEffects: boolean;
   };
 }
 
@@ -51,6 +53,7 @@ export const defaultSettings: SettingsState = {
   display: {
     compactMode: false,
     animations: true,
+    ambientEffects: true,
   },
 };
 
@@ -393,6 +396,26 @@ export function SettingsPanel({
                       checked={settings.display.animations}
                       onChange={() => toggleDisplay('animations')}
                       label="Toggle animations"
+                    />
+                  </div>
+
+                  {/* Ambient Effects */}
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-bg-elevated border border-border-subtle">
+                    <div className="flex items-center gap-3">
+                      <Cloud className="w-4 h-4 text-primary-cyan" />
+                      <div>
+                        <p className="text-sm text-text-primary font-medium">
+                          Ambient Effects
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          Noise grain and floating gradient orbs
+                        </p>
+                      </div>
+                    </div>
+                    <Toggle
+                      checked={settings.display.ambientEffects}
+                      onChange={() => toggleDisplay('ambientEffects')}
+                      label="Toggle ambient effects"
                     />
                   </div>
                 </div>

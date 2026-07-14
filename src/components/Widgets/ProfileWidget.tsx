@@ -99,8 +99,23 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <h2 className="text-2xl font-bold text-text-primary tracking-tight mb-1">
-            Krittaphat Panyasomphan
+          <h2 className="text-2xl font-bold text-text-primary tracking-tight mb-1 overflow-hidden">
+            {"Krittaphat Panyasomphan".split("").map((char, i) => (
+              <motion.span
+                key={i}
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{
+                  delay: 0.3 + i * 0.03,
+                  duration: 0.4,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
+                className="inline-block"
+                style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+              >
+                {char}
+              </motion.span>
+            ))}
           </h2>
           <p className="text-text-secondary text-sm mb-4 h-5">
             <span>{displayText}</span>

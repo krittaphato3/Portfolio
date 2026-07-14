@@ -27,6 +27,7 @@ import {
   type GitHubUserProfile,
 } from './lib/github';
 import { defaultSettings, type SettingsState } from './components/UI/SettingsPanel';
+import { AmbientBackground } from './components/UI/AmbientBackground';
 
 // Lazy load heavy pages
 const CertificatesPage = lazy(() => import('./pages/CertificatesPage').then(m => ({ default: m.CertificatesPage })));
@@ -217,9 +218,12 @@ function App() {
     loadSkills();
   }, []);
 
+  const showAmbient = settings.display?.ambientEffects ?? true;
+
   return (
     <SettingsProvider settings={settings} updateSettings={setSettings}>
       <div className="min-h-screen bg-bg-dark flex flex-col">
+        {showAmbient && <AmbientBackground />}
         <Header settings={settings} onSettingsChange={setSettings} />
 
         <main id="main-content" className="flex-1">
