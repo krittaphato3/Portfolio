@@ -4,7 +4,7 @@ import type { Certificate, CertificateConfig, CategoryData } from '../types';
 // Dynamic import of all config files in src/config/certs/
 const certModules = import.meta.glob('/config/certs/*.yml', {
   query: '?raw',
-  import: 'original',
+  import: 'default',
 });
 
 // Map filename slug → display name and public directory name

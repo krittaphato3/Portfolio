@@ -16,7 +16,7 @@ interface YamlSkillsConfig {
 
 const skillModules = import.meta.glob('/config/skills/config.yml', {
   query: '?raw',
-  import: 'original',
+  import: 'default',
 });
 
 const iconToCategory: Record<string, Skill['category']> = {
