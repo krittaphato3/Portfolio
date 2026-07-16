@@ -12,7 +12,7 @@ export function Footer() {
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm text-text-muted">
-            <span>Built with</span>
+            <span>© {new Date().getFullYear()} Krittaphat Panyasomphan. Built with</span>
             <motion.span
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
