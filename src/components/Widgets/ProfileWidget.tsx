@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, GitBranch, ExternalLink, Mail, CircleDot, Instagram, Linkedin } from 'lucide-react';
+import { MapPin, Calendar, GitBranch, ExternalLink, Mail, CircleDot } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { GitHubUserProfile } from '../../lib/github';
 
@@ -182,10 +182,14 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
             whileTap={{ scale: 0.95 }}
-            className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-primary-pink/30 hover:bg-bg-hover transition-all"
+            className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-pink-400/30 hover:bg-bg-hover transition-all"
             aria-label="Instagram"
           >
-            <Instagram className="w-4 h-4 text-text-secondary" />
+            <svg className="w-4 h-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+            </svg>
           </motion.a>
           <motion.a
             href="https://www.linkedin.com/in/krittaphatpany/"
@@ -193,10 +197,14 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
             whileTap={{ scale: 0.95 }}
-            className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-primary-blue/30 hover:bg-bg-hover transition-all"
+            className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-blue-400/30 hover:bg-bg-hover transition-all"
             aria-label="LinkedIn"
           >
-            <Linkedin className="w-4 h-4 text-text-secondary" />
+            <svg className="w-4 h-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+              <rect width="4" height="12" x="2" y="9" />
+              <circle cx="4" cy="4" r="2" />
+            </svg>
           </motion.a>
         </motion.div>
       </div>
