@@ -16,7 +16,7 @@ const educationData: EducationEntry[] = [
   {
     institution: 'KMUTT',
     degree: 'Bachelor of Engineering in Computer Engineering',
-    period: '2021 – Present',
+    period: '2024 – Present',
     location: 'Bang Mot, Thung Khru, Bangkok',
     status: 'pursuing',
     logoUrl: 'https://www.kmutt.ac.th/fileadmin/templates/img/logo-kmutt.png',
@@ -25,7 +25,7 @@ const educationData: EducationEntry[] = [
   {
     institution: 'Sarasas Witaed Samut Prakan',
     degree: 'High School Diploma (Matayom 6)',
-    period: '2018 – 2021',
+    period: '2021 – 2024',
     location: 'Samut Prakan, Thailand',
     status: 'completed',
     logoFallback: GraduationCap,
