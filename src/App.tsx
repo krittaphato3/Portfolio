@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
+import { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation } from 'react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './components/Header';
@@ -21,7 +21,6 @@ import type { Skill, ActivityItem, CategoryData } from './lib/types';
 import { getAllCertificates } from './lib/certificates';
 import { loadSkillsFromYaml } from './lib/skills';
 import {
-  fetchRepoCount,
   fetchPinnedRepos,
   fetchGitHubUser,
   fetchGitHubEvents,
@@ -152,9 +151,9 @@ function App() {
   }, [githubEvents, certUpdates]);
 
   // Handler: open cert in viewer from ActivityFeed
-  const handleCertClick = (certId: string) => {
+  const handleCertClick = useCallback((certId: string) => {
     setViewerCertId(certId);
-  };
+  }, []);
 
   // Fetch GitHub data (events poll every 5 minutes, profile/repos on mount)
   useEffect(() => {
@@ -162,14 +161,13 @@ function App() {
 
     async function loadGitHub() {
       try {
-        const [count, pinned, profile, events] = await Promise.all([
-          fetchRepoCount(),
+        const [pinned, profile, events] = await Promise.all([
           fetchPinnedRepos(),
           fetchGitHubUser(),
           fetchGitHubEvents(),
         ]);
         if (!isActive) return;
-        setRepoCount(count);
+        setRepoCount(profile.public_repos);
         setPinnedRepos(pinned);
         setGithubProfile(profile);
         setGithubEvents(events);
@@ -239,7 +237,7 @@ function App() {
     }
 
     loadCerts();
-    const interval = setInterval(loadCerts, 60_000);
+    const interval = setInterval(loadCerts, 300_000);
     return () => { isActive = false; clearInterval(interval); };
   }, [showToast]);
 

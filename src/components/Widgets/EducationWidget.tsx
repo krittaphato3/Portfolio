@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { GraduationCap, MapPin, Cpu } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 
 interface EducationEntry {
   institution: string;
@@ -88,7 +88,7 @@ function StatusBadge({ status }: { status: EducationEntry['status'] }) {
   );
 }
 
-export function EducationWidget() {
+export const EducationWidget = memo(function EducationWidget() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-100px' });
 
@@ -167,4 +167,4 @@ export function EducationWidget() {
       </div>
     </div>
   );
-}
+});
