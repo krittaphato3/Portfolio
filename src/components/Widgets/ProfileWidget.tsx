@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, GitBranch, ExternalLink } from 'lucide-react';
+import { MapPin, Calendar, GitBranch, ExternalLink, Mail, CircleDot } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { GitHubUserProfile } from '../../lib/github';
 
@@ -128,7 +128,7 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap gap-3 mb-6"
+          className="flex flex-wrap gap-3 mb-4"
         >
           <span className="flex items-center gap-1.5 text-xs text-text-muted">
             <MapPin className="w-3.5 h-3.5" /> Bangkok, Thailand
@@ -136,6 +136,26 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           <span className="flex items-center gap-1.5 text-xs text-text-muted">
             <Calendar className="w-3.5 h-3.5" /> Joined 2021
           </span>
+        </motion.div>
+
+        {/* Status & Email */}
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.25 }}
+          className="flex flex-wrap gap-2 mb-5"
+        >
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-primary-emerald/10 text-primary-emerald border border-primary-emerald/20">
+            <CircleDot className="w-3 h-3" />
+            Open for Offers
+          </span>
+          <a
+            href="mailto:krittaphat.pany@gmail.com"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-primary-cyan/10 text-primary-cyan border border-primary-cyan/20 hover:bg-primary-cyan/20 transition-colors"
+          >
+            <Mail className="w-3 h-3" />
+            krittaphat.pany@gmail.com
+          </a>
         </motion.div>
 
         {/* Social Links */}
