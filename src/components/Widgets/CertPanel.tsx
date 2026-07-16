@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, memo } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 
@@ -341,7 +341,7 @@ function CertCard({
 /* ----------------------------------------------------------------
    CERT PANEL (CONSOLIDATED)
    ---------------------------------------------------------------- */
-export function CertPanel({
+export const CertPanel = memo(function CertPanel({
   categories,
   loading,
   limit = 6,
@@ -584,4 +584,4 @@ export function CertPanel({
 
     </div>
   );
-}
+});

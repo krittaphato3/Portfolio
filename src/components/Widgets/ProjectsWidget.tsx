@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { Pin, ExternalLink, Star, GitFork, ArrowUpRight } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, memo } from 'react';
 import type { PinnedRepo } from '../../lib/github';
 import { useSettings } from '../../hooks/useSettings';
 
@@ -125,7 +125,7 @@ function RepoCardContent({ repo, topics, lang }: { repo: PinnedRepo; topics: Rep
   );
 }
 
-export function ProjectsWidget({ repos, loading }: ProjectsWidgetProps) {
+export const ProjectsWidget = memo(function ProjectsWidget({ repos, loading }: ProjectsWidgetProps) {
   const { settings } = useSettings();
   const animationsEnabled = settings.display.animations;
 
@@ -177,4 +177,4 @@ export function ProjectsWidget({ repos, loading }: ProjectsWidgetProps) {
       )}
     </div>
   );
-}
+});

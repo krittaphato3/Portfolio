@@ -130,8 +130,6 @@ function SkillChip({ skill, styles, index, animationsEnabled }: SkillChipProps) 
   return (
     <motion.div
       ref={ref}
-      layout
-      layoutId={skill.name}
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={isInView ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
       transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 25 }}
@@ -169,7 +167,6 @@ function CategorySection({ category, skills, index, animationsEnabled }: Categor
   return (
     <motion.div
       ref={ref}
-      layout
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
       transition={{ delay: index * 0.12, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}

@@ -3,7 +3,7 @@ import { Activity, Award, Pin, Folder, Sparkles, Plus, MapPin, ExternalLink, Che
 import type { ActivityItem } from '../../lib/types';
 import { useSettings } from '../../hooks/useSettings';
 import { MagneticButton } from '../UI/MagneticButton';
-import { useRef, useState } from 'react';
+import { useRef, useState, memo } from 'react';
 
 interface ActivityFeedProps {
   activities: ActivityItem[];
@@ -175,7 +175,7 @@ function ActivityItemContent({ activity, config, Icon, isFirst, isLast, onCertCl
   );
 }
 
-export function ActivityFeed({
+export const ActivityFeed = memo(function ActivityFeed({
   activities,
   loading,
   onAddCertificate,
@@ -293,4 +293,4 @@ export function ActivityFeed({
       )}
     </div>
   );
-}
+});
