@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { BackToTop } from './components/UI/BackToTop';
 import { type Notification } from './components/UI/NotificationsPanel';
 import { Dashboard, BentoItem } from './components/Layout/Dashboard';
 import { ProfileWidget } from './components/Widgets/ProfileWidget';
@@ -29,6 +30,7 @@ import {
 } from './lib/github';
 import { defaultSettings, type SettingsState } from './components/UI/SettingsPanel';
 import { AmbientBackground } from './components/UI/AmbientBackground';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 // Lazy load heavy pages
 const CertificatesPage = lazy(() => import('./pages/CertificatesPage').then(m => ({ default: m.CertificatesPage })));
@@ -405,11 +407,13 @@ function App() {
                 </motion.div>
               }
             />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           </AnimatePresence>
         </main>
 
         <Footer />
+        <BackToTop />
 
         {/* Certificate viewers — rendered at App level (outside BentoItems)
             to escape CSS transform containing blocks that break fixed positioning */}
