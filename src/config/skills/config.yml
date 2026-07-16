@@ -40,6 +40,12 @@ categories:
         level: 90
       - name: Microservices
         level: 75
+      - name: Docker
+        level: 78
+      - name: Kubernetes
+        level: 65
+      - name: AWS
+        level: 74
 
   - name: Systems & Low-Level
     icon: "database"
@@ -72,6 +78,12 @@ categories:
         level: 72
       - name: CTF / Red Teaming
         level: 68
+      - name: Wireshark
+        level: 70
+      - name: Nmap
+        level: 68
+      - name: Burp Suite
+        level: 72
 
   - name: AI / Machine Learning
     icon: "code"
@@ -90,6 +102,10 @@ categories:
         level: 65
       - name: MLOps
         level: 60
+      - name: OpenAI API
+        level: 75
+      - name: LangChain
+        level: 65
 
   - name: Design
     icon: "palette"
@@ -120,3 +136,9 @@ categories:
         level: 85
       - name: VS Code / JetBrains IDEs
         level: 95
+      - name: GitHub Actions
+        level: 80
+      - name: VS Code
+        level: 95
+      - name: JetBrains IDEs
+        level: 85
