@@ -81,24 +81,10 @@ function AnimatedNumber({ value, suffix = '' }: { value: number; suffix?: string
 }
 
 function FloatingOrb({ color, delay = 0, style }: { color: 'cyan' | 'violet' | 'emerald'; delay?: number; style?: React.CSSProperties }) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  useEffect(() => {
-    const controls = animate(x, [0, 15, -10, 0], {
-      duration: 8,
-      repeat: Infinity,
-      ease: 'easeInOut',
-      delay,
-    });
-    const controlsY = animate(y, [0, -10, 15, 0], {
-      duration: 10,
-      repeat: Infinity,
-      ease: 'easeInOut',
-      delay: delay + 1,
-    });
-    return () => { controls.stop(); controlsY.stop(); };
-  }, [x, y, delay]);
+  // Use CSS animations instead of framer-motion animate() for better performance.
+  // CSS animations are GPU-composited and don't require React re-renders or
+  // continuous JS animation loops. The prefers-reduced-motion media query in
+  // index.css already disables all CSS animations for users who prefer it.
 
   const colors = {
     cyan: 'bg-primary-cyan/10',
@@ -107,9 +93,9 @@ function FloatingOrb({ color, delay = 0, style }: { color: 'cyan' | 'violet' | '
   };
 
   return (
-    <motion.div
-      style={{ x, y, ...style }}
-      className={`absolute rounded-full blur-2xl pointer-events-none ${colors[color]} transition-opacity`}
+    <div
+      style={{ ...style, animation: `float-orb 8s ease-in-out ${delay}s infinite` }}
+      className={`absolute rounded-full blur-2xl pointer-events-none ${colors[color]}`}
       aria-hidden="true"
     />
   );
@@ -136,18 +122,6 @@ export function StatCard({
       {/* Animated background orbs */}
       <FloatingOrb color={color as 'cyan' | 'violet' | 'emerald'} delay={0} style={{ width: '80px', height: '80px', top: '-40px', right: '-40px' }} />
       <FloatingOrb color={color as 'cyan' | 'violet' | 'emerald'} delay={2} style={{ width: '60px', height: '60px', bottom: '-30px', left: '-30px' }} />
-
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none" aria-hidden="true">
-        <svg width="100%" height="100%">
-          <defs>
-            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </div>
 
       <div className="relative z-10 flex items-start justify-between">
         <div>

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import type { ReactNode } from 'react';
 
@@ -12,7 +12,6 @@ interface MagneticButtonProps {
 
 export function MagneticButton({ children, className = '', onClick, strength = 0.2, ...props }: MagneticButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -32,7 +31,6 @@ export function MagneticButton({ children, className = '', onClick, strength = 0
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
-    setIsHovered(false);
   };
 
   return (
@@ -40,7 +38,6 @@ export function MagneticButton({ children, className = '', onClick, strength = 0
       ref={ref}
       style={{ x: springX, y: springY }}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.97 }}

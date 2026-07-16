@@ -236,7 +236,7 @@ export function SearchModal({ open, onClose, items, onOpenSettings }: SearchModa
           break;
       }
     },
-    [results, activeIndex, onClose]
+    [results, activeIndex, onClose, onOpenSettings]
   );
 
   return (
