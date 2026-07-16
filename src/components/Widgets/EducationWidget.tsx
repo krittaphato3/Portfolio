@@ -28,7 +28,7 @@ const educationData: EducationEntry[] = [
     period: '2021 – 2024',
     location: 'Samut Prakan, Thailand',
     status: 'completed',
-    logoUrl: '/logos/sarasas-ektra.png',
+    logoUrl: '/logos/sarasas.png',
     logoFallback: GraduationCap,
   },
 ];
