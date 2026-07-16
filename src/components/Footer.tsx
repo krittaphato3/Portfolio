@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Heart, GitBranch } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -31,17 +31,22 @@ export function Footer() {
             >
               GitHub
             </a>
-            <motion.a
-              href="https://github.com/krittaphato3"
+            <a
+              href="https://www.instagram.com/krittao3"
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
-              whileTap={{ scale: 0.95 }}
-              className="text-text-muted hover:text-text-primary transition-colors"
-              aria-label="GitHub"
+              className="text-sm text-text-muted hover:text-text-primary transition-colors"
             >
-              <GitBranch className="w-5 h-5" />
-            </motion.a>
+              Instagram
+            </a>
+            <a
+              href="https://www.linkedin.com/in/krittaphatpany/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-text-muted hover:text-text-primary transition-colors"
+            >
+              LinkedIn
+            </a>
           </div>
         </div>
       </div>
