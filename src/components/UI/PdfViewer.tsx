@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Download, LinkIcon, Building2, Calendar } from 'lucide-react';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 
+// SECURITY: pdfjs worker loaded from unpkg.com CDN without SRI.
+// TODO: Bundle the worker locally via Vite ?url import for supply chain safety.
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface PdfViewerProps {

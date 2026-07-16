@@ -161,16 +161,18 @@ function App() {
 
     async function loadGitHub() {
       try {
-        const [pinned, profile, events] = await Promise.all([
-          fetchPinnedRepos(),
-          fetchGitHubUser(),
-          fetchGitHubEvents(),
-        ]);
+        const profileResult = await fetchGitHubUser().catch(() => null);
+        const pinnedResult = await fetchPinnedRepos().catch(() => []);
+        const eventsResult = await fetchGitHubEvents().catch(() => []);
+
         if (!isActive) return;
-        setRepoCount(profile.public_repos);
-        setPinnedRepos(pinned);
-        setGithubProfile(profile);
-        setGithubEvents(events);
+
+        if (profileResult) {
+          setRepoCount(profileResult.public_repos);
+          setGithubProfile(profileResult);
+        }
+        setPinnedRepos(pinnedResult);
+        setGithubEvents(eventsResult);
       } catch {
         if (isActive) {
           showToast(
@@ -187,11 +189,11 @@ function App() {
     // Poll GitHub events every 5 minutes (keep profile/repos on mount only)
     const interval = setInterval(() => {
       fetchGitHubEvents().then((events) => {
-        if (isActive) setGithubEvents(events);
+        if (isActive && events.length > 0) setGithubEvents(events);
       }).catch(() => {});
     }, 300_000);
     return () => { isActive = false; clearInterval(interval); };
-  }, [showToast]);
+  }, []);
 
   // Fetch certificates from file-based CMS (polls every 60s for YAML changes)
   useEffect(() => {
@@ -239,23 +241,26 @@ function App() {
     loadCerts();
     const interval = setInterval(loadCerts, 300_000);
     return () => { isActive = false; clearInterval(interval); };
-  }, [showToast]);
+  }, []);
 
   // Fetch skills from YAML config
   useEffect(() => {
+    let isActive = true;
+
     async function loadSkills() {
       try {
         const loaded = await loadSkillsFromYaml();
-        setSkills(loaded);
+        if (isActive) setSkills(loaded);
       } catch (err) {
         if (import.meta.env.DEV) {
           console.error('Failed to load skills from YAML:', err);
         }
       } finally {
-        setLoading((prev) => ({ ...prev, skills: false }));
+        if (isActive) setLoading((prev) => ({ ...prev, skills: false }));
       }
     }
     loadSkills();
+    return () => { isActive = false; };
   }, []);
 
   const showAmbient = settings.display?.ambientEffects ?? true;

@@ -62,7 +62,7 @@ export function safeImageUrl(url: string | undefined): string {
     if (['http:', 'https:'].includes(parsed.protocol)) return url;
     return '';
   } catch {
-    return url;
+    return '';
   }
 }
 
