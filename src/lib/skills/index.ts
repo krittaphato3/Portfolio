@@ -14,7 +14,7 @@ interface YamlSkillsConfig {
   categories: YamlSkillCategory[];
 }
 
-const skillModules = import.meta.glob('/config/skills/config.yml', {
+const skillModules = import.meta.glob('/src/config/skills/config.yml', {
   query: '?raw',
   import: 'default',
 });
