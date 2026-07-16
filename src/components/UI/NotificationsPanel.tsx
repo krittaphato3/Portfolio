@@ -25,6 +25,7 @@ export interface Notification {
   timestamp: Date;
   read: boolean;
   url?: string;
+  certificateId?: string;
 }
 
 interface NotificationsPanelProps {

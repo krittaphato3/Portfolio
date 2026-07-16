@@ -12,18 +12,18 @@ import {
 } from 'lucide-react';
 import { useThemeContext } from '../hooks/useTheme';
 import { SearchModal, useSearchShortcut } from './UI/SearchModal';
-import { NotificationsPanel, useSampleNotifications } from './UI/NotificationsPanel';
+import { NotificationsPanel, type Notification } from './UI/NotificationsPanel';
 import { SettingsPanel, type SettingsState } from './UI/SettingsPanel';
 
 interface HeaderProps {
   settings: SettingsState;
   onSettingsChange: (settings: SettingsState) => void;
+  notifications: Notification[];
 }
 
-export function Header({ settings, onSettingsChange }: HeaderProps) {
+export function Header({ settings, onSettingsChange, notifications }: HeaderProps) {
   const { theme, setTheme } = useThemeContext();
-  const defaultNotifications = useSampleNotifications();
-  const [notifications, setNotifications] = useState(defaultNotifications);
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
   // Skip link for accessibility
   const [_skipLinkVisible, _setSkipLinkVisible] = useState(false);
@@ -40,7 +40,12 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
     }
   }, [settings.theme, theme, setTheme]);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const notificationsWithRead = notifications.map(n => ({
+    ...n,
+    read: readIds.has(n.id),
+  }));
+
+  const unreadCount = notificationsWithRead.filter((n) => !n.read).length;
 
   const toggleSearch = useCallback(() => {
     setSearchOpen((prev) => !prev);
@@ -148,17 +153,9 @@ export function Header({ settings, onSettingsChange }: HeaderProps) {
               <NotificationsPanel
                 open={notifOpen}
                 onClose={handleNotifClose}
-                notifications={notifications}
-                onMarkRead={(id) =>
-                  setNotifications((prev) =>
-                    prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-                  )
-                }
-                onMarkAllRead={() =>
-                  setNotifications((prev) =>
-                    prev.map((n) => ({ ...n, read: true }))
-                  )
-                }
+                notifications={notificationsWithRead}
+                onMarkRead={(id) => setReadIds(prev => new Set(prev).add(id))}
+                onMarkAllRead={() => setReadIds(new Set(notifications.map(n => n.id)))}
               />
             </div>
 

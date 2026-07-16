@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { type Notification } from './components/UI/NotificationsPanel';
 import { Dashboard, BentoItem } from './components/Layout/Dashboard';
 import { ProfileWidget } from './components/Widgets/ProfileWidget';
 import { StatCard } from './components/Widgets/StatCard';
@@ -112,6 +113,43 @@ function App() {
       .flatMap((cat) => cat.certificates)
       .find((c) => c.id === viewerCertId) || null;
   }, [viewerCertId, categories]);
+
+  // Derived: real notifications from GitHub events and certificates
+  const notifications: Notification[] = useMemo(() => {
+    const items: Notification[] = [];
+
+    githubEvents.forEach((event) => {
+      items.push({
+        id: `gh-${event.id}`,
+        type: 'project',
+        title: event.title,
+        description: event.description,
+        timestamp: event.timestamp,
+        read: false,
+        url: event.url,
+      });
+    });
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    certUpdates
+      .filter((cert) => cert.timestamp >= thirtyDaysAgo)
+      .slice(0, 3)
+      .forEach((cert) => {
+        items.push({
+          id: cert.id,
+          type: 'cert',
+          title: cert.title,
+          description: cert.description,
+          timestamp: cert.timestamp,
+          read: false,
+          url: cert.url,
+          certificateId: cert.certificateId,
+        });
+      });
+
+    return items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }, [githubEvents, certUpdates]);
 
   // Handler: open cert in viewer from ActivityFeed
   const handleCertClick = (certId: string) => {
@@ -228,7 +266,7 @@ function App() {
     <SettingsProvider settings={settings} updateSettings={setSettings}>
       <div className="min-h-screen bg-bg-dark flex flex-col">
         {showAmbient && <AmbientBackground />}
-        <Header settings={settings} onSettingsChange={setSettings} />
+        <Header settings={settings} onSettingsChange={setSettings} notifications={notifications} />
 
         <main id="main-content" className="flex-1">
           <AnimatePresence mode="wait">
