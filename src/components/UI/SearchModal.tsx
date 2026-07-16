@@ -11,6 +11,7 @@ import {
   Folder,
   Award,
   Settings,
+  Mail,
 } from 'lucide-react';
 
 /* ----------------------------------------------------------------
@@ -76,6 +77,22 @@ const defaultItems: SearchItem[] = [
     category: 'page',
     url: '#skills',
     icon: <FileText className="w-4 h-4" />,
+  },
+  {
+    id: 'nav-education',
+    title: 'Education',
+    description: 'Academic background and qualifications',
+    category: 'page',
+    url: '#education',
+    icon: <FileText className="w-4 h-4" />,
+  },
+  {
+    id: 'nav-contact',
+    title: 'Contact',
+    description: 'Email and social links',
+    category: 'page',
+    url: '#',
+    icon: <Mail className="w-4 h-4" />,
   },
 ];
 
