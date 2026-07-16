@@ -76,7 +76,8 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
                 src={avatarUrl}
                 alt="Krittaphat Panyasomphan - GitHub Profile"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
+                loading="eager"
+                fetchPriority="high"
               />
             ) : (
               <span className="text-3xl font-bold text-gradient-mixed">KP</span>
