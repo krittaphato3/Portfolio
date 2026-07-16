@@ -14,9 +14,9 @@ interface YamlSkillsConfig {
   categories: YamlSkillCategory[];
 }
 
-const skillModules = import.meta.glob('/public/skills/config.yml', {
+const skillModules = import.meta.glob('/config/skills/config.yml', {
   query: '?raw',
-  import: 'default',
+  import: 'original',
 });
 
 const iconToCategory: Record<string, Skill['category']> = {
