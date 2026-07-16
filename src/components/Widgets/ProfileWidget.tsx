@@ -163,7 +163,7 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex gap-2 mt-auto"
+          className="flex gap-2"
         >
           <motion.a
             href={githubUrl}
