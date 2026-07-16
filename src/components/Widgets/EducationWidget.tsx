@@ -14,7 +14,7 @@ interface EducationEntry {
 
 const educationData: EducationEntry[] = [
   {
-    institution: 'KMUTT',
+    institution: "King Mongkut's University of Technology Thonburi",
     degree: 'Bachelor of Engineering in Computer Engineering',
     period: '2024 – Present',
     location: 'Bang Mot, Thung Khru, Bangkok',
@@ -28,6 +28,7 @@ const educationData: EducationEntry[] = [
     period: '2021 – 2024',
     location: 'Samut Prakan, Thailand',
     status: 'completed',
+    logoUrl: 'https://www.ektra.ac.th/wp-content/uploads/2026/02/aw_EktraLogo_envelop-01-2-1.png',
     logoFallback: GraduationCap,
   },
 ];
