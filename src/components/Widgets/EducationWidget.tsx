@@ -19,7 +19,7 @@ const educationData: EducationEntry[] = [
     period: '2024 – Present',
     location: 'Bang Mot, Thung Khru, Bangkok',
     status: 'pursuing',
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Sublogo_of_King_Mongkut%27s_University_of_Technology_Thonburi.svg/960px-Sublogo_of_King_Mongkut%27s_University_of_Technology_Thonburi.svg.png',
+    logoUrl: '/logos/kmutt.png',
     logoFallback: Cpu,
   },
   {
@@ -28,7 +28,7 @@ const educationData: EducationEntry[] = [
     period: '2021 – 2024',
     location: 'Samut Prakan, Thailand',
     status: 'completed',
-    logoUrl: 'https://www.ektra.ac.th/wp-content/uploads/2026/02/aw_EktraLogo_envelop-01-2-1.png',
+    logoUrl: '/logos/sarasas-ektra.png',
     logoFallback: GraduationCap,
   },
 ];
