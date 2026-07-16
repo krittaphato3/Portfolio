@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, GitBranch, ExternalLink, Mail, CircleDot } from 'lucide-react';
+import { MapPin, Calendar, GitBranch, ExternalLink, Mail, CircleDot, Instagram, Linkedin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { GitHubUserProfile } from '../../lib/github';
 
@@ -175,6 +175,28 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
             aria-label="GitHub"
           >
             <GitBranch className="w-4 h-4 text-text-secondary" />
+          </motion.a>
+          <motion.a
+            href="https://www.instagram.com/krittao3"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-primary-pink/30 hover:bg-bg-hover transition-all"
+            aria-label="Instagram"
+          >
+            <Instagram className="w-4 h-4 text-text-secondary" />
+          </motion.a>
+          <motion.a
+            href="https://www.linkedin.com/in/krittaphatpany/"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-primary-blue/30 hover:bg-bg-hover transition-all"
+            aria-label="LinkedIn"
+          >
+            <Linkedin className="w-4 h-4 text-text-secondary" />
           </motion.a>
         </motion.div>
       </div>
