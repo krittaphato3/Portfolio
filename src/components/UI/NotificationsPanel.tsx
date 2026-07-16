@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell,
@@ -299,49 +299,50 @@ export function NotificationsPanel({
    HOOK: Generate sample notifications from app data
    ---------------------------------------------------------------- */
 export function useSampleNotifications(): Notification[] {
-  const [notifications] = useState<Notification[]>(() => [
-    {
-      id: 'n-1',
-      type: 'project',
-      title: 'New commit on portfolio',
-      description: 'feat: Add search modal component with Cmd+K support',
-      timestamp: new Date(Date.now() - 1000 * 60 * 12),
-      read: false,
-      url: 'https://github.com',
-    },
-    {
-      id: 'n-2',
-      type: 'cert',
-      title: 'Certification renewed',
-      description: 'AWS Solutions Architect Associate renewed successfully',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3),
-      read: false,
-    },
-    {
-      id: 'n-3',
-      type: 'system',
-      title: 'System status healthy',
-      description: 'All portfolio services are operational and responding',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8),
-      read: true,
-    },
-    {
-      id: 'n-4',
-      type: 'alert',
-      title: 'Token expiring soon',
-      description: 'GitHub personal access token expires in 14 days',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
-      read: true,
-    },
-    {
-      id: 'n-5',
-      type: 'project',
-      title: 'PR merged',
-      description: 'Refactor skills widget to use category grouping',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48),
-      read: true,
-    },
-  ]);
-
-  return notifications;
+  return useMemo(
+    () => [
+      {
+        id: 'n-1',
+        type: 'project',
+        title: 'New commit on portfolio',
+        description: 'feat: Add search modal component with Cmd+K support',
+        timestamp: new Date(Date.now() - 1000 * 60 * 12),
+        read: false,
+        url: 'https://github.com',
+      },
+      {
+        id: 'n-2',
+        type: 'cert',
+        title: 'Certification renewed',
+        description: 'AWS Solutions Architect Associate renewed successfully',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3),
+        read: false,
+      },
+      {
+        id: 'n-3',
+        type: 'system',
+        title: 'System status healthy',
+        description: 'All portfolio services are operational and responding',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8),
+        read: true,
+      },
+      {
+        id: 'n-4',
+        type: 'alert',
+        title: 'Token expiring soon',
+        description: 'GitHub personal access token expires in 14 days',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
+        read: true,
+      },
+      {
+        id: 'n-5',
+        type: 'project',
+        title: 'PR merged',
+        description: 'Refactor skills widget to use category grouping',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48),
+        read: true,
+      },
+    ],
+    []
+  );
 }

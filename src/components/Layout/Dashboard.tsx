@@ -4,6 +4,7 @@ import { useRef } from 'react';
 
 interface DashboardProps {
   children: ReactNode;
+  compactMode?: boolean;
 }
 
 const container = {
@@ -17,17 +18,17 @@ const container = {
   },
 };
 
-export function Dashboard({ children }: DashboardProps) {
+export function Dashboard({ children, compactMode = false }: DashboardProps) {
   return (
     <motion.div
       variants={container}
       initial="hidden"
       animate="show"
-      className="min-h-screen bg-bg-dark p-4 md:p-6 lg:p-8"
+      className={`min-h-screen bg-bg-dark ${compactMode ? 'p-2 md:p-3 lg:p-4' : 'p-4 md:p-6 lg:p-8'}`}
     >
       <div className="max-w-[1600px] mx-auto">
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6 auto-rows-min">
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 ${compactMode ? 'gap-2 md:gap-3 lg:gap-4' : 'gap-4 md:gap-5 lg:gap-6'} auto-rows-min`}>
           {children}
         </div>
       </div>

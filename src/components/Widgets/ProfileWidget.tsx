@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { MapPin, Calendar, GitBranch, ExternalLink } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { GitHubUserProfile } from '../../lib/github';

@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Award } from 'lucide-react';
 import { CertPanel } from '../components/Widgets/CertPanel';
-import { getAllCertificates, getCertificateStats } from '../lib/certificates';
+import { getAllCertificates } from '../lib/certificates';
 import type { CategoryData } from '../lib/types';
 
 export function CertificatesPage() {
@@ -14,12 +14,9 @@ export function CertificatesPage() {
   useEffect(() => {
     async function loadCerts() {
       try {
-        const [cats, stats] = await Promise.all([
-          getAllCertificates(),
-          getCertificateStats(),
-        ]);
+        const cats = await getAllCertificates();
         setCategories(cats);
-        setCertCount(stats.total);
+        setCertCount(cats.flatMap((c) => c.certificates).length);
       } catch {
         // Errors handled silently; CertPanel shows empty state
       } finally {

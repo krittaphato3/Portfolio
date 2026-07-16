@@ -15,8 +15,8 @@ import { SystemStatusWidget } from './components/Widgets/SystemStatusWidget';
 import { useToast } from './components/UI/Toast';
 import { SettingsProvider } from './hooks/useSettings';
 import { Folder, Award, Code2, Rocket } from 'lucide-react';
-import type { Skill, ActivityItem, CategoryData, Certificate } from './lib/types';
-import { getAllCertificates, getCertificateStats } from './lib/certificates';
+import type { Skill, ActivityItem, CategoryData } from './lib/types';
+import { getAllCertificates } from './lib/certificates';
 import { loadSkillsFromYaml } from './lib/skills';
 import {
   fetchRepoCount,
@@ -86,11 +86,14 @@ function App() {
     return new Set(skills.map((s) => s.name)).size;
   }, [skills]);
 
-  // Derived: years coding from GitHub join date (fallback 5)
+  // Derived: years coding from GitHub join date
   const yearsCoding = useMemo(() => {
-    const joinYear = 2021;
-    return new Date().getFullYear() - joinYear;
-  }, []);
+    if (githubProfile?.created_at) {
+      const joinYear = new Date(githubProfile.created_at).getFullYear();
+      return new Date().getFullYear() - joinYear;
+    }
+    return new Date().getFullYear() - 2021; // fallback
+  }, [githubProfile]);
 
   // Derived: merge cert + real GitHub events, sorted by timestamp descending
   const recentUpdates = useMemo(
@@ -159,14 +162,14 @@ function App() {
 
     async function loadCerts() {
       try {
-        const [cats, stats] = await Promise.all([
-          getAllCertificates(),
-          getCertificateStats(),
-        ]);
+        const cats = await getAllCertificates();
         if (!isActive) return;
 
         setCategories(cats);
-        setCertCount(stats.total);
+
+        // Compute stats from fetched categories instead of re-fetching
+        const allCerts = cats.flatMap((c) => c.certificates);
+        setCertCount(allCerts.length);
 
         // Build cert activity items from ALL certs with full metadata
         const updates: ActivityItem[] = cats
@@ -239,7 +242,7 @@ function App() {
                   transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
                 >
                 <div id="dashboard">
-                  <Dashboard>
+                  <Dashboard compactMode={settings.display.compactMode}>
                     {/* Row 1: Profile + 3 Stats */}
                     <BentoItem span={{ col: 1, row: 2 }}>
                       <ProfileWidget githubProfile={githubProfile} />
