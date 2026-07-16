@@ -1,17 +1,16 @@
 import * as yaml from 'js-yaml';
 import type { Certificate, CertificateConfig, CategoryData } from '../types';
 
-// Dynamic import of all config.yml files in the certs directory
-const certModules = import.meta.glob('/public/certs/*/config.yml', {
+// Dynamic import of all config files in src/config/certs/
+const certModules = import.meta.glob('/src/config/certs/*.yml', {
   query: '?raw',
   import: 'default',
 });
 
-// Map of category slugs to their human-readable names
-const categoryNames: Record<string, string> = {
-  'cyber-security': 'Cyber Security',
-  'web-development': 'Web Development',
-  'system-analyst': 'System Analyst',
+// Map filename slug → display name and public directory name
+const certConfigMap: Record<string, { name: string; dir: string }> = {
+  'cyber-security': { name: 'Cyber Security', dir: 'Cyber Security' },
+  'internship-forage': { name: 'Internship (Forage)', dir: 'Internship (Forage)' },
 };
 
 const PDF_EXTENSIONS = new Set(['.pdf']);
@@ -36,13 +35,18 @@ export async function getAllCertificates(): Promise<CategoryData[]> {
       const raw = (await loader()) as string;
       const config = yaml.load(raw) as CertificateConfig;
 
-      // Normalize path for Windows compatibility
+      // Extract slug from path like "/config/certs/cyber-security.yml"
       const normalizedPath = path.replace(/\\/g, '/');
-      const pathMatch = normalizedPath.match(/\/certs\/([^/]+)\//);
-      if (!pathMatch) continue;
+      const slugMatch = normalizedPath.match(/\/config\/certs\/([^/]+)\.yml$/);
+      if (!slugMatch) continue;
 
-      const categoryName = pathMatch[1];
+      const fileSlug = slugMatch[1];
+      const meta = certConfigMap[fileSlug];
+      if (!meta) continue;
+
+      const categoryName = meta.name;
       const categorySlug = slugify(categoryName);
+      const publicDir = meta.dir;
 
       // Validate and filter certificate entries
       const validCerts = (config?.certificates || []).filter(
@@ -50,7 +54,7 @@ export async function getAllCertificates(): Promise<CategoryData[]> {
       );
 
       const certificates: Certificate[] = validCerts.map((cert, index) => {
-        const imageUrl = cert.image ? `/certs/${categoryName}/${cert.image}` : '';
+        const imageUrl = cert.image ? `/certs/${publicDir}/${cert.image}` : '';
         const fileType = cert.image ? detectFileType(cert.image) : 'image';
 
         return {
@@ -68,7 +72,7 @@ export async function getAllCertificates(): Promise<CategoryData[]> {
       });
 
       categories.push({
-        name: categoryNames[categorySlug] || categoryName,
+        name: categoryName,
         slug: categorySlug,
         certificates,
       });

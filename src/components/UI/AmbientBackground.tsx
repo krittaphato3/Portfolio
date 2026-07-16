@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion';
-
 export function AmbientBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
@@ -13,32 +11,14 @@ export function AmbientBackground() {
       />
 
       {/* Floating gradient orb 1 — cyan */}
-      <motion.div
-        className="absolute w-[500px] h-[500px] rounded-full blur-[100px]"
-        animate={{
-          x: [0, 80, -40, 0],
-          y: [0, -60, 50, 0],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
+      <div
+        className="absolute w-[500px] h-[500px] rounded-full blur-[100px] animate-[ambient-float_20s_ease-in-out_infinite]"
         style={{ top: '5%', left: '15%', background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)' }}
       />
 
       {/* Floating gradient orb 2 — violet */}
-      <motion.div
-        className="absolute w-[400px] h-[400px] rounded-full blur-[80px]"
-        animate={{
-          x: [0, -60, 40, 0],
-          y: [0, 40, -50, 0],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
+      <div
+        className="absolute w-[400px] h-[400px] rounded-full blur-[80px] animate-[ambient-float_25s_ease-in-out_infinite_reverse]"
         style={{ top: '45%', right: '5%', background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)' }}
       />
     </div>

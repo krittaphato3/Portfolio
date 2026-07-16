@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
@@ -101,7 +101,7 @@ function FloatingOrb({ color, delay = 0, style }: { color: 'cyan' | 'violet' | '
   );
 }
 
-export function StatCard({
+export const StatCard = memo(function StatCard({
   title,
   value,
   suffix,
@@ -160,4 +160,4 @@ export function StatCard({
       />
     </motion.div>
   );
-}
+});

@@ -1,4 +1,9 @@
 certificates:
+  - image: "Diploma_a8d304f9-cf7b-4413-ba14-988b2ab90f93-1.png"
+    link: "https://qualys.sumtotal.host/learning/DataStore/QUALYS_PROD/Learning/Data/ExportToPDF/Diploma_a8d304f9-cf7b-4413-ba14-988b2ab90f93.pdf"
+    description: "Vulnerability Management Detection and Response Certification (VMDR) of Qualys"
+    issuer: "Qualys"
+    date: "2026-07-16"
   - image: "Diploma_4a774c34-cde8-45a0-b948-7bc956017fa5-1.png"
     link: "https://qualys.sumtotal.host/learning/DataStore/QUALYS_PROD/Learning/Data/ExportToPDF/Diploma_4a774c34-cde8-45a0-b948-7bc956017fa5.pdf"
     description: "Cloud Agents Training of Qualys"

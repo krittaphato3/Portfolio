@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, GitBranch, ExternalLink } from 'lucide-react';
+import { MapPin, Calendar, GitBranch, ExternalLink, Mail, CircleDot } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { GitHubUserProfile } from '../../lib/github';
 
@@ -52,7 +52,7 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
   }, [displayText, isDeleting, roleIndex]);
 
   return (
-    <div className="relative p-6 h-full overflow-hidden min-h-[320px]">
+    <div className="relative p-6 h-full overflow-hidden min-h-[380px]">
       {/* Background gradient orbs */}
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary-cyan/8 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary-violet/8 rounded-full blur-3xl pointer-events-none" />
@@ -63,7 +63,7 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-cyan via-primary-violet to-primary-emerald p-[2px] mb-5 shadow-[0_0_30px_rgba(6,182,212,0.2)] relative group cursor-pointer"
+          className="w-32 h-32 rounded-2xl bg-gradient-to-br from-primary-cyan via-primary-violet to-primary-emerald p-[2px] mb-5 shadow-[0_0_30px_rgba(6,182,212,0.2)] relative group cursor-pointer"
           onClick={() => window.open(githubUrl, '_blank', 'noopener,noreferrer')}
           role="button"
           tabIndex={0}
@@ -128,7 +128,7 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap gap-3 mb-6"
+          className="flex flex-wrap gap-3 mb-4"
         >
           <span className="flex items-center gap-1.5 text-xs text-text-muted">
             <MapPin className="w-3.5 h-3.5" /> Bangkok, Thailand
@@ -138,12 +138,32 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           </span>
         </motion.div>
 
+        {/* Status & Email */}
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.25 }}
+          className="flex flex-wrap gap-2 mb-5"
+        >
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-primary-emerald/10 text-primary-emerald border border-primary-emerald/20">
+            <CircleDot className="w-3 h-3" />
+            Open for Offers
+          </span>
+          <a
+            href="mailto:krittaphat.pany@gmail.com"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-primary-cyan/10 text-primary-cyan border border-primary-cyan/20 hover:bg-primary-cyan/20 transition-colors"
+          >
+            <Mail className="w-3 h-3" />
+            krittaphat.pany@gmail.com
+          </a>
+        </motion.div>
+
         {/* Social Links */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex gap-2 mt-auto"
+          className="flex gap-2"
         >
           <motion.a
             href={githubUrl}
@@ -155,6 +175,36 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
             aria-label="GitHub"
           >
             <GitBranch className="w-4 h-4 text-text-secondary" />
+          </motion.a>
+          <motion.a
+            href="https://www.instagram.com/krittao3"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-pink-400/30 hover:bg-bg-hover transition-all"
+            aria-label="Instagram"
+          >
+            <svg className="w-4 h-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+            </svg>
+          </motion.a>
+          <motion.a
+            href="https://www.linkedin.com/in/krittaphatpany/"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.08, y: -2, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2.5 rounded-xl bg-bg-elevated border border-border-subtle hover:border-blue-400/30 hover:bg-bg-hover transition-all"
+            aria-label="LinkedIn"
+          >
+            <svg className="w-4 h-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+              <rect width="4" height="12" x="2" y="9" />
+              <circle cx="4" cy="4" r="2" />
+            </svg>
           </motion.a>
         </motion.div>
       </div>

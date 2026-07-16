@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { memo } from 'react';
 import { Cpu, HardDrive, Wifi, Zap } from 'lucide-react';
 
 interface SystemMetric {
@@ -67,7 +68,7 @@ const colorStyles = {
   },
 } as const;
 
-export function SystemStatusWidget() {
+export const SystemStatusWidget = memo(function SystemStatusWidget() {
   return (
     <div className="p-6">
       <div className="flex items-center gap-3 mb-6">
@@ -124,4 +125,4 @@ export function SystemStatusWidget() {
       </div>
     </div>
   );
-}
+});

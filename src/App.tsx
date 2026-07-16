@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
+import { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation } from 'react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { type Notification } from './components/UI/NotificationsPanel';
 import { Dashboard, BentoItem } from './components/Layout/Dashboard';
 import { ProfileWidget } from './components/Widgets/ProfileWidget';
 import { StatCard } from './components/Widgets/StatCard';
@@ -12,6 +13,7 @@ import { SkillsWidget } from './components/Widgets/SkillsWidget';
 import { ActivityFeed } from './components/Widgets/ActivityFeed';
 import { ProjectsWidget } from './components/Widgets/ProjectsWidget';
 import { SystemStatusWidget } from './components/Widgets/SystemStatusWidget';
+import { EducationWidget } from './components/Widgets/EducationWidget';
 import { useToast } from './components/UI/Toast';
 import { SettingsProvider } from './hooks/useSettings';
 import { Folder, Award, Code2, Rocket } from 'lucide-react';
@@ -19,7 +21,6 @@ import type { Skill, ActivityItem, CategoryData } from './lib/types';
 import { getAllCertificates } from './lib/certificates';
 import { loadSkillsFromYaml } from './lib/skills';
 import {
-  fetchRepoCount,
   fetchPinnedRepos,
   fetchGitHubUser,
   fetchGitHubEvents,
@@ -112,10 +113,47 @@ function App() {
       .find((c) => c.id === viewerCertId) || null;
   }, [viewerCertId, categories]);
 
+  // Derived: real notifications from GitHub events and certificates
+  const notifications: Notification[] = useMemo(() => {
+    const items: Notification[] = [];
+
+    githubEvents.forEach((event) => {
+      items.push({
+        id: `gh-${event.id}`,
+        type: 'project',
+        title: event.title,
+        description: event.description,
+        timestamp: event.timestamp,
+        read: false,
+        url: event.url,
+      });
+    });
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    certUpdates
+      .filter((cert) => cert.timestamp >= thirtyDaysAgo)
+      .slice(0, 3)
+      .forEach((cert) => {
+        items.push({
+          id: cert.id,
+          type: 'cert',
+          title: cert.title,
+          description: cert.description,
+          timestamp: cert.timestamp,
+          read: false,
+          url: cert.url,
+          certificateId: cert.certificateId,
+        });
+      });
+
+    return items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }, [githubEvents, certUpdates]);
+
   // Handler: open cert in viewer from ActivityFeed
-  const handleCertClick = (certId: string) => {
+  const handleCertClick = useCallback((certId: string) => {
     setViewerCertId(certId);
-  };
+  }, []);
 
   // Fetch GitHub data (events poll every 5 minutes, profile/repos on mount)
   useEffect(() => {
@@ -123,14 +161,13 @@ function App() {
 
     async function loadGitHub() {
       try {
-        const [count, pinned, profile, events] = await Promise.all([
-          fetchRepoCount(),
+        const [pinned, profile, events] = await Promise.all([
           fetchPinnedRepos(),
           fetchGitHubUser(),
           fetchGitHubEvents(),
         ]);
         if (!isActive) return;
-        setRepoCount(count);
+        setRepoCount(profile.public_repos);
         setPinnedRepos(pinned);
         setGithubProfile(profile);
         setGithubEvents(events);
@@ -200,7 +237,7 @@ function App() {
     }
 
     loadCerts();
-    const interval = setInterval(loadCerts, 60_000);
+    const interval = setInterval(loadCerts, 300_000);
     return () => { isActive = false; clearInterval(interval); };
   }, [showToast]);
 
@@ -227,7 +264,7 @@ function App() {
     <SettingsProvider settings={settings} updateSettings={setSettings}>
       <div className="min-h-screen bg-bg-dark flex flex-col">
         {showAmbient && <AmbientBackground />}
-        <Header settings={settings} onSettingsChange={setSettings} />
+        <Header settings={settings} onSettingsChange={setSettings} notifications={notifications} />
 
         <main id="main-content" className="flex-1">
           <AnimatePresence mode="wait">
@@ -316,7 +353,14 @@ function App() {
                       />
                     </BentoItem>
 
-                    {/* Row 4: Certifications compact */}
+                    {/* Row 4: Education (spans 2 cols) */}
+                    <BentoItem span={{ col: 2, row: 1 }}>
+                      <div id="education" className="h-[500px]">
+                        <EducationWidget />
+                      </div>
+                    </BentoItem>
+
+                    {/* Row 5: Certifications compact */}
                     <BentoItem span={{ col: 4, row: 1 }}>
                       <div id="certifications">
                         <CertPanel

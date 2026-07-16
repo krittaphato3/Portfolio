@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import type { ReactNode } from 'react';
-import { useRef } from 'react';
+import { memo, useRef } from 'react';
 
 interface DashboardProps {
   children: ReactNode;
@@ -18,7 +18,7 @@ const container = {
   },
 };
 
-export function Dashboard({ children, compactMode = false }: DashboardProps) {
+export const Dashboard = memo(function Dashboard({ children, compactMode = false }: DashboardProps) {
   return (
     <motion.div
       variants={container}
@@ -34,7 +34,7 @@ export function Dashboard({ children, compactMode = false }: DashboardProps) {
       </div>
     </motion.div>
   );
-}
+});
 
 /* ---------------------------------------------------------------
    BENTO ITEM WRAPPER
