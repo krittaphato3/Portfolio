@@ -19,7 +19,7 @@ const educationData: EducationEntry[] = [
     period: '2024 – Present',
     location: 'Bang Mot, Thung Khru, Bangkok',
     status: 'pursuing',
-    logoUrl: 'https://www.kmutt.ac.th/fileadmin/templates/img/logo-kmutt.png',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Sublogo_of_King_Mongkut%27s_University_of_Technology_Thonburi.svg/960px-Sublogo_of_King_Mongkut%27s_University_of_Technology_Thonburi.svg.png',
     logoFallback: Cpu,
   },
   {
