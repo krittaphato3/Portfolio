@@ -12,6 +12,7 @@ import { SkillsWidget } from './components/Widgets/SkillsWidget';
 import { ActivityFeed } from './components/Widgets/ActivityFeed';
 import { ProjectsWidget } from './components/Widgets/ProjectsWidget';
 import { SystemStatusWidget } from './components/Widgets/SystemStatusWidget';
+import { EducationWidget } from './components/Widgets/EducationWidget';
 import { useToast } from './components/UI/Toast';
 import { SettingsProvider } from './hooks/useSettings';
 import { Folder, Award, Code2, Rocket } from 'lucide-react';
@@ -316,7 +317,14 @@ function App() {
                       />
                     </BentoItem>
 
-                    {/* Row 4: Certifications compact */}
+                    {/* Row 4: Education (spans 2 cols) */}
+                    <BentoItem span={{ col: 2, row: 1 }}>
+                      <div id="education" className="h-[500px]">
+                        <EducationWidget />
+                      </div>
+                    </BentoItem>
+
+                    {/* Row 5: Certifications compact */}
                     <BentoItem span={{ col: 4, row: 1 }}>
                       <div id="certifications">
                         <CertPanel
