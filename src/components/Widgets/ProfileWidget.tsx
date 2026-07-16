@@ -52,7 +52,7 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
   }, [displayText, isDeleting, roleIndex]);
 
   return (
-    <div className="relative p-6 h-full overflow-hidden min-h-[320px]">
+    <div className="relative p-6 h-full overflow-hidden min-h-[380px]">
       {/* Background gradient orbs */}
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary-cyan/8 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary-violet/8 rounded-full blur-3xl pointer-events-none" />
@@ -63,7 +63,7 @@ export function ProfileWidget({ githubProfile }: ProfileWidgetProps) {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-cyan via-primary-violet to-primary-emerald p-[2px] mb-5 shadow-[0_0_30px_rgba(6,182,212,0.2)] relative group cursor-pointer"
+          className="w-32 h-32 rounded-2xl bg-gradient-to-br from-primary-cyan via-primary-violet to-primary-emerald p-[2px] mb-5 shadow-[0_0_30px_rgba(6,182,212,0.2)] relative group cursor-pointer"
           onClick={() => window.open(githubUrl, '_blank', 'noopener,noreferrer')}
           role="button"
           tabIndex={0}
