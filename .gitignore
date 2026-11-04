@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Production build output
+dist/
+
+# Playwright & test artifacts
+.playwright-mcp/
+
+# Temporary data files
+github_repos.json
+profile_readme.md
+*.log
+.zcode/
+
+# Environment variables
+.env
+.env.local
+
+# Operating System files
+.DS_Store
+Thumbs.db
